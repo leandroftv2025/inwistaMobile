@@ -12,18 +12,21 @@ interface AuthContextType {
   login: (userId: string, userData: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("inwista-user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setIsInitialized(true);
   }, []);
 
   const login = (userId: string, userData: User) => {
@@ -46,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         isAuthenticated: !!user,
+        isInitialized,
       }}
     >
       {children}

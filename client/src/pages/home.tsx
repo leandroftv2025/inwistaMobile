@@ -20,7 +20,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
@@ -28,8 +28,14 @@ import { useQuery } from "@tanstack/react-query";
 export default function Home() {
   const [, setLocation] = useLocation();
   const [showBalance, setShowBalance] = useState(true);
-  const { getUserId } = useAuth();
-  const userId = getUserId();
+  const { user, isAuthenticated, isInitialized } = useAuth();
+  const userId = user?.id;
+
+  useEffect(() => {
+    if (isInitialized && !isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [isInitialized, isAuthenticated, setLocation]);
 
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: [`/api/user/${userId}`],
@@ -94,11 +100,6 @@ export default function Home() {
       positive: tx.type === 'sell',
     })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
-
-  if (!userId) {
-    setLocation('/login');
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatDateTime, generateQRCode } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -21,10 +22,15 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function PIX() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, isAuthenticated, isInitialized } = useAuth();
+  const userId = user?.id;
   const [activeTab, setActiveTab] = useState("send");
   const [copiedKey, setCopiedKey] = useState(false);
   
@@ -32,41 +38,54 @@ export default function PIX() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
 
-  const pixKeys = [
-    { type: "cpf", value: "123.456.789-00" },
-    { type: "email", value: "ana@inwista.com" },
-    { type: "phone", value: "(11) 98765-4321" },
-  ];
+  useEffect(() => {
+    if (isInitialized && !isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [isInitialized, isAuthenticated, setLocation]);
 
-  const transactions = [
-    {
-      id: "1",
-      type: "received",
-      name: "Maria Silva",
-      key: "maria@email.com",
-      amount: 250.00,
-      date: new Date(),
-      status: "completed",
+  const { data: pixKeys = [], isLoading: isLoadingKeys, error: keysError } = useQuery({
+    queryKey: [`/api/pix/keys/${userId}`],
+    enabled: !!userId,
+  });
+
+  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useQuery({
+    queryKey: [`/api/pix/transactions/${userId}`],
+    enabled: !!userId,
+  });
+
+  const sendPixMutation = useMutation({
+    mutationFn: async (data: { userId: string; recipientKey: string; amount: number; description?: string }) => {
+      const response = await apiRequest("/api/pix/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Erro ao enviar PIX");
+      }
+      return response.json();
     },
-    {
-      id: "2",
-      type: "sent",
-      name: "João Santos",
-      key: "123.456.789-00",
-      amount: 150.00,
-      date: new Date(Date.now() - 86400000),
-      status: "completed",
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/pix/transactions/${userId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/user/${userId}`] });
+      toast({
+        title: "PIX enviado com sucesso!",
+        description: `${formatCurrency(parseFloat(amount))} para ${recipientKey}`,
+      });
+      setRecipientKey("");
+      setAmount("");
+      setDescription("");
     },
-    {
-      id: "3",
-      type: "received",
-      name: "Carlos Oliveira",
-      key: "(11) 99999-8888",
-      amount: 500.00,
-      date: new Date(Date.now() - 172800000),
-      status: "completed",
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao enviar PIX",
+        description: error.message,
+      });
     },
-  ];
+  });
 
   const handleSendPix = () => {
     if (!recipientKey || !amount) {
@@ -78,14 +97,21 @@ export default function PIX() {
       return;
     }
 
-    toast({
-      title: "PIX enviado com sucesso!",
-      description: `${formatCurrency(parseFloat(amount))} para ${recipientKey}`,
-    });
+    if (!userId) {
+      toast({
+        variant: "destructive",
+        title: "Erro de autenticação",
+        description: "Faça login novamente",
+      });
+      return;
+    }
 
-    setRecipientKey("");
-    setAmount("");
-    setDescription("");
+    sendPixMutation.mutate({
+      userId: userId!,
+      recipientKey,
+      amount: parseFloat(amount),
+      description: description || undefined,
+    });
   };
 
   const copyKey = (key: string) => {
@@ -186,9 +212,10 @@ export default function PIX() {
                 <Button
                   className="w-full"
                   onClick={handleSendPix}
+                  disabled={sendPixMutation.isPending}
                   data-testid="button-send-pix"
                 >
-                  Enviar PIX
+                  {sendPixMutation.isPending ? "Enviando..." : "Enviar PIX"}
                 </Button>
               </CardContent>
             </Card>
@@ -203,32 +230,48 @@ export default function PIX() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pixKeys.map((key, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 border rounded-md hover-elevate"
-                    data-testid={`pix-key-${key.type}`}
-                  >
-                    <div>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {key.type}
-                      </p>
-                      <p className="font-mono font-medium">{key.value}</p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => copyKey(key.value)}
-                      data-testid={`button-copy-${key.type}`}
-                    >
-                      {copiedKey ? (
-                        <Check className="h-4 w-4" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
+                {isLoadingKeys ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
                   </div>
-                ))}
+                ) : keysError ? (
+                  <p className="text-center text-destructive py-8">
+                    Erro ao carregar chaves PIX. Tente novamente.
+                  </p>
+                ) : pixKeys.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhuma chave PIX cadastrada
+                  </p>
+                ) : (
+                  pixKeys.map((key: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 border rounded-md hover-elevate"
+                      data-testid={`pix-key-${key.type}`}
+                    >
+                      <div>
+                        <p className="text-sm text-muted-foreground capitalize">
+                          {key.type}
+                        </p>
+                        <p className="font-mono font-medium">{key.value}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => copyKey(key.value)}
+                        data-testid={`button-copy-${key.type}`}
+                      >
+                        {copiedKey ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
 
@@ -241,12 +284,20 @@ export default function PIX() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-center">
-                  <img
-                    src={generateQRCode(pixKeys[0].value)}
-                    alt="QR Code PIX"
-                    className="w-64 h-64 border rounded-md"
-                    data-testid="img-qr-code"
-                  />
+                  {isLoadingKeys ? (
+                    <Skeleton className="w-64 h-64" />
+                  ) : pixKeys.length > 0 ? (
+                    <img
+                      src={generateQRCode(pixKeys[0].value)}
+                      alt="QR Code PIX"
+                      className="w-64 h-64 border rounded-md"
+                      data-testid="img-qr-code"
+                    />
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Cadastre uma chave PIX para gerar QR Code
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" className="flex-1" data-testid="button-share-qr">
@@ -271,40 +322,56 @@ export default function PIX() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {transactions.map((transaction) => (
-                  <div key={transaction.id} data-testid={`transaction-${transaction.id}`}>
-                    <div className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`rounded-full p-2 ${transaction.type === "received" ? "bg-green-500/10" : "bg-muted"}`}>
-                          {transaction.type === "received" ? (
-                            <ArrowDownLeft className="h-4 w-4 text-green-600 dark:text-green-400" />
-                          ) : (
-                            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium">{transaction.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {transaction.key}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-xs text-muted-foreground">
-                              {formatDateTime(transaction.date)}
+                {isLoadingTransactions ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                ) : transactionsError ? (
+                  <p className="text-center text-destructive py-8">
+                    Erro ao carregar transações. Tente novamente.
+                  </p>
+                ) : transactions.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhuma transação encontrada
+                  </p>
+                ) : (
+                  transactions.map((transaction: any) => (
+                    <div key={transaction.id} data-testid={`transaction-${transaction.id}`}>
+                      <div className="flex items-center justify-between py-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`rounded-full p-2 ${transaction.direction === "received" ? "bg-green-500/10" : "bg-muted"}`}>
+                            {transaction.direction === "received" ? (
+                              <ArrowDownLeft className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            ) : (
+                              <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium">{transaction.recipientKey || 'PIX'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {transaction.description || '—'}
                             </p>
-                            <Badge variant="secondary" className="text-xs">
-                              {transaction.status === "completed" ? "Concluído" : "Pendente"}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-1">
+                              <p className="text-xs text-muted-foreground">
+                                {formatDateTime(new Date(transaction.timestamp))}
+                              </p>
+                              <Badge variant="secondary" className="text-xs">
+                                Concluído
+                              </Badge>
+                            </div>
                           </div>
                         </div>
+                        <p className={`font-semibold font-mono tabular-nums ${transaction.direction === "received" ? "text-green-600 dark:text-green-400" : "text-foreground"}`}>
+                          {transaction.direction === "received" ? "+" : "-"}
+                          {formatCurrency(transaction.amount)}
+                        </p>
                       </div>
-                      <p className={`font-semibold font-mono tabular-nums ${transaction.type === "received" ? "text-green-600 dark:text-green-400" : "text-foreground"}`}>
-                        {transaction.type === "received" ? "+" : "-"}
-                        {formatCurrency(transaction.amount)}
-                      </p>
+                      <Separator />
                     </div>
-                    <Separator />
-                  </div>
-                ))}
+                  ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
