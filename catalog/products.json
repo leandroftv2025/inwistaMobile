@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "pix",
+    "name": "PIX",
+    "category": "payments",
+    "short": "Transferências instantâneas",
+    "description": "Envie e receba dinheiro na hora com segurança",
+    "enabled": true
+  },
+  {
+    "slug": "stablecoin",
+    "name": "StableCOIN",
+    "category": "crypto",
+    "short": "BRL ↔ stable conversion",
+    "description": "Converta seus reais em moeda digital estável",
+    "enabled": true
+  },
+  {
+    "slug": "investments",
+    "name": "Investimentos",
+    "category": "invest",
+    "short": "Aplicações e retornos",
+    "description": "Faça seu dinheiro render com segurança",
+    "enabled": true
+  },
+  {
+    "slug": "card",
+    "name": "Cartão",
+    "category": "banking",
+    "short": "Débito e crédito",
+    "description": "Cartões virtuais e físicos",
+    "enabled": false
+  },
+  {
+    "slug": "fx-remittance",
+    "name": "Câmbio e Remessas",
+    "category": "fx",
+    "short": "Envios internacionais",
+    "description": "Transferências internacionais com as melhores taxas",
+    "enabled": false
+  },
+  {
+    "slug": "support",
+    "name": "Ajuda",
+    "category": "help",
+    "short": "Suporte e FAQs",
+    "description": "Central de ajuda e atendimento",
+    "enabled": true
+  }
+]

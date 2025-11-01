@@ -32,15 +32,15 @@
 
   --sidebar-border: 210 6% 86%;
 
-  --sidebar-primary: 195 85% 42%;
+  --sidebar-primary: 175 85% 45%;
 
-  --sidebar-primary-foreground: 195 85% 98%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
   --sidebar-accent: 210 8% 88%;
 
   --sidebar-accent-foreground: 210 6% 12%;
 
-  --sidebar-ring: 195 85% 42%;
+  --sidebar-ring: 175 85% 45%;
 
   --popover: 210 6% 92%;
 
@@ -48,9 +48,9 @@
 
   --popover-border: 210 6% 84%;
 
-  --primary: 195 85% 42%;
+  --primary: 175 85% 45%;
 
-  --primary-foreground: 195 85% 98%;
+  --primary-foreground: 0 0% 100%;
 
   --secondary: 210 8% 86%;
 
@@ -69,11 +69,11 @@
   --destructive-foreground: 0 72% 98%;
 
   --input: 210 12% 75%;
-  --ring: 195 85% 42%;
-  --chart-1: 195 85% 42%;
-  --chart-2: 165 75% 45%;
-  --chart-3: 210 60% 48%;
-  --chart-4: 180 70% 40%;
+  --ring: 175 85% 45%;
+  --chart-1: 175 85% 45%;
+  --chart-2: 210 85% 45%;
+  --chart-3: 165 75% 45%;
+  --chart-4: 140 65% 45%;
   --chart-5: 200 80% 38%;
 
   --font-sans: Inter, Open Sans, sans-serif;
@@ -150,15 +150,15 @@
 
   --sidebar-border: 210 6% 20%;
 
-  --sidebar-primary: 195 85% 45%;
+  --sidebar-primary: 175 85% 50%;
 
-  --sidebar-primary-foreground: 195 85% 98%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
   --sidebar-accent: 210 8% 18%;
 
   --sidebar-accent-foreground: 210 5% 95%;
 
-  --sidebar-ring: 195 85% 45%;
+  --sidebar-ring: 175 85% 50%;
 
   --popover: 210 6% 15%;
 
@@ -166,9 +166,9 @@
 
   --popover-border: 210 6% 22%;
 
-  --primary: 195 85% 45%;
+  --primary: 175 85% 50%;
 
-  --primary-foreground: 195 85% 98%;
+  --primary-foreground: 0 0% 100%;
 
   --secondary: 210 8% 20%;
 
@@ -187,11 +187,11 @@
   --destructive-foreground: 0 72% 98%;
 
   --input: 210 12% 32%;
-  --ring: 195 85% 45%;
-  --chart-1: 195 85% 65%;
-  --chart-2: 165 75% 62%;
-  --chart-3: 210 60% 68%;
-  --chart-4: 180 70% 60%;
+  --ring: 175 85% 50%;
+  --chart-1: 175 85% 65%;
+  --chart-2: 210 85% 65%;
+  --chart-3: 165 75% 62%;
+  --chart-4: 140 65% 60%;
   --chart-5: 200 80% 58%;
 
   --shadow-2xs: 0px 1px 2px 0px hsl(210 10% 3% / 0.15);

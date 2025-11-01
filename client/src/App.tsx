@@ -3,14 +3,31 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/lib/theme-provider";
+import { AuthProvider } from "@/lib/auth-context";
+import Welcome from "@/pages/welcome";
+import Login from "@/pages/login";
+import TwoFA from "@/pages/two-fa";
+import Home from "@/pages/home";
+import PIX from "@/pages/pix";
+import StableCOIN from "@/pages/stablecoin";
+import Investments from "@/pages/investments";
+import Settings from "@/pages/settings";
+import Support from "@/pages/support";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
-      {/* Add pages below */}
-      {/* <Route path="/" component={Home}/> */}
-      {/* Fallback to 404 */}
+      <Route path="/" component={Welcome} />
+      <Route path="/login" component={Login} />
+      <Route path="/two-fa" component={TwoFA} />
+      <Route path="/home" component={Home} />
+      <Route path="/pix" component={PIX} />
+      <Route path="/stablecoin" component={StableCOIN} />
+      <Route path="/investments" component={Investments} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/support" component={Support} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -19,10 +36,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="system" storageKey="inwista-theme">
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
