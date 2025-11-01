@@ -1,6 +1,7 @@
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/lib/theme-provider";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,8 +16,10 @@ export default function Settings() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
+    logout();
     toast({
       title: "Logout realizado",
       description: "Até logo!",

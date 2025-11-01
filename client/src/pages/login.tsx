@@ -8,6 +8,8 @@ import { CPFInput } from "@/components/cpf-input";
 import { useLocation } from "wouter";
 import { ArrowLeft, Eye, EyeOff, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -15,7 +17,32 @@ export default function Login() {
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: { cpf: string; password: string }) => {
+      const response = await apiRequest("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Erro ao fazer login");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("inwista-pending-auth", JSON.stringify(data));
+      setLocation("/two-fa");
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao fazer login",
+        description: error.message,
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +65,7 @@ export default function Login() {
       return;
     }
 
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      setLocation("/two-fa");
-    }, 1000);
+    loginMutation.mutate({ cpf, password });
   };
 
   return (
@@ -78,7 +100,7 @@ export default function Login() {
                   id="cpf"
                   value={cpf}
                   onChange={setCpf}
-                  disabled={isLoading}
+                  disabled={loginMutation.isPending}
                   autoFocus
                 />
               </div>
@@ -91,7 +113,7 @@ export default function Login() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
+                    disabled={loginMutation.isPending}
                     placeholder="Digite sua senha"
                     data-testid="input-password"
                   />
@@ -115,10 +137,10 @@ export default function Login() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading}
+                disabled={loginMutation.isPending}
                 data-testid="button-submit"
               >
-                {isLoading ? "Entrando..." : "Continuar"}
+                {loginMutation.isPending ? "Entrando..." : "Continuar"}
               </Button>
 
               <Button

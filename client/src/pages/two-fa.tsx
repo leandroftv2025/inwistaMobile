@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,12 +7,60 @@ import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
 import { ArrowLeft, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth-context";
 
 export default function TwoFA() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { login } = useAuth();
   const [code, setCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [pendingAuth, setPendingAuth] = useState<any>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("inwista-pending-auth");
+    if (stored) {
+      setPendingAuth(JSON.parse(stored));
+    } else {
+      setLocation("/login");
+    }
+  }, [setLocation]);
+
+  const verifyMutation = useMutation({
+    mutationFn: async (code: string) => {
+      if (!pendingAuth?.userId) {
+        throw new Error("Sessão expirada. Por favor, faça login novamente.");
+      }
+      const response = await apiRequest("/api/auth/verify-2fa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, userId: pendingAuth.userId }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Erro ao verificar código");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      localStorage.removeItem("inwista-pending-auth");
+      login(data.user.id, data.user);
+      toast({
+        title: "Verificação concluída!",
+        description: "Bem-vindo à Inwista",
+      });
+      setLocation("/home");
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro na verificação",
+        description: error.message,
+      });
+      setCode("");
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +74,7 @@ export default function TwoFA() {
       return;
     }
 
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      setLocation("/home");
-    }, 1000);
+    verifyMutation.mutate(code);
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,7 +158,7 @@ export default function TwoFA() {
                   onChange={handleCodeChange}
                   placeholder="Digite o código"
                   maxLength={8}
-                  disabled={isLoading}
+                  disabled={verifyMutation.isPending}
                   data-testid="input-code"
                   className="text-center text-lg tracking-widest font-mono"
                 />
@@ -127,10 +170,10 @@ export default function TwoFA() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading || code.length !== 8}
+                disabled={verifyMutation.isPending || code.length !== 8}
                 data-testid="button-verify"
               >
-                {isLoading ? "Verificando..." : "Verificar código"}
+                {verifyMutation.isPending ? "Verificando..." : "Verificar código"}
               </Button>
             </form>
           </CardContent>
