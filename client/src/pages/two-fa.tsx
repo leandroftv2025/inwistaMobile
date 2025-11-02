@@ -41,13 +41,19 @@ export default function TwoFA() {
       }
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       localStorage.removeItem("inwista-pending-auth");
+      
+      // Atualiza o estado de autenticação ANTES de redirecionar
       login(data.user.id, data.user);
+      
       toast({
         title: "Verificação concluída!",
         description: "Bem-vindo à Inwista",
       });
+      
+      // Pequeno delay para garantir que o estado foi atualizado
+      await new Promise(resolve => setTimeout(resolve, 100));
       setLocation("/home");
     },
     onError: (error: Error) => {
