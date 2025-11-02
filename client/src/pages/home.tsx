@@ -24,7 +24,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
-import type { User, PixTransaction, StablecoinTransaction } from "@shared/schema";
+import type { User, PixTransaction, StablecoinTransaction, Investment } from "@shared/schema";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -53,6 +53,11 @@ export default function Home() {
     enabled: !!userId,
   });
 
+  const { data: userInvestments = [], isLoading: isLoadingInvestments } = useQuery<Investment[]>({
+    queryKey: [`/api/investments/portfolio/${userId}`],
+    enabled: !!userId,
+  });
+
   interface CatalogItem {
     slug: string;
     name: string;
@@ -66,7 +71,9 @@ export default function Home() {
   });
 
   const balance = parseFloat(userData?.balanceBRL || '0');
-  const totalInvested = parseFloat(userData?.totalInvested || '0');
+  const totalInvested = userInvestments
+    .filter(inv => inv.status === 'active')
+    .reduce((sum, inv) => sum + parseFloat(inv.amount || '0'), 0);
   const netWorth = balance + parseFloat(userData?.balanceStable || '0') + totalInvested;
 
   const iconMap: Record<string, any> = {
