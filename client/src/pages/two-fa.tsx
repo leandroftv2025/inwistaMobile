@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -26,11 +24,6 @@ export default function TwoFA() {
       setLocation("/login");
     }
   }, [setLocation]);
-
-  const handleBackToLogin = () => {
-    localStorage.removeItem("inwista-pending-auth");
-    setLocation("/login");
-  };
 
   const verifyMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -90,34 +83,8 @@ export default function TwoFA() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBackToLogin}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              localStorage.removeItem("inwista-pending-auth");
-              setLocation("/");
-            }}
-            data-testid="button-close"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
         <Card>
           <CardHeader className="space-y-4">
-            <div className="flex justify-center">
-              <Logo size="md" />
-            </div>
             <div className="space-y-2">
               <CardTitle className="text-xl">Vamos ativar o token no seu novo dispositivo</CardTitle>
               <CardDescription>
