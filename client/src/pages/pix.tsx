@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatDateTime, generateQRCode } from "@/lib/utils";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowDownLeft,
@@ -25,6 +25,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User, PixKey, PixTransaction } from "@shared/schema";
+import qrCodeImage from "@assets/qrcode-pix_1762052957607.jpg";
 
 export default function PIX() {
   const [, setLocation] = useLocation();
@@ -190,10 +191,9 @@ export default function PIX() {
   const downloadQRCode = () => {
     if (pixKeys.length === 0) return;
     
-    const qrCodeUrl = generateQRCode(pixKeys[0].keyValue);
     const link = document.createElement('a');
-    link.href = qrCodeUrl;
-    link.download = 'qrcode-pix.png';
+    link.href = qrCodeImage;
+    link.download = 'qrcode-pix.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -367,7 +367,7 @@ export default function PIX() {
                     <Skeleton className="w-64 h-64" />
                   ) : pixKeys.length > 0 ? (
                     <img
-                      src={generateQRCode(pixKeys[0].keyValue)}
+                      src={qrCodeImage}
                       alt="QR Code PIX"
                       className="w-64 h-64 border rounded-md"
                       data-testid="img-qr-code"
