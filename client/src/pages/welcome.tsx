@@ -1,7 +1,6 @@
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Shield, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function Welcome() {
@@ -20,50 +19,6 @@ export default function Welcome() {
           <p className="text-muted-foreground">
             Vamos começar sua jornada financeira
           </p>
-        </div>
-
-        <div className="space-y-4">
-          <Card className="hover-elevate">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="rounded-full bg-primary/10 p-3">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">PIX Instantâneo</h3>
-                <p className="text-sm text-muted-foreground">
-                  Transferências rápidas e seguras
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover-elevate">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="rounded-full bg-chart-2/10 p-3">
-                <Shield className="h-6 w-6 text-chart-2" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">StableCOIN</h3>
-                <p className="text-sm text-muted-foreground">
-                  Conversão BRL com segurança
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover-elevate">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="rounded-full bg-chart-3/10 p-3">
-                <TrendingUp className="h-6 w-6 text-chart-3" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">Investimentos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Faça seu dinheiro render
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <Button
