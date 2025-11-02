@@ -115,6 +115,20 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/profile")}
+              data-testid="button-profile"
+              className="rounded-full"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="" alt={userData?.name || 'Usuário'} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  {userData?.name?.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase() || 'US'}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
             <Badge variant="secondary" className="hidden sm:flex">
               Olá, {userData?.name?.split(' ')[0] || 'Usuário'}
             </Badge>
@@ -132,20 +146,6 @@ export default function Home() {
               <Settings className="h-5 w-5" />
             </Button>
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/profile")}
-              data-testid="button-profile"
-              className="rounded-full"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt={userData?.name || 'Usuário'} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {userData?.name?.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase() || 'US'}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
           </div>
         </div>
       </header>
@@ -213,49 +213,6 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Produtos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {isLoadingCatalog ? (
-              <>
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </>
-            ) : (
-              products.map((product: any) => (
-                <Card
-                  key={product.slug}
-                  className={`hover-elevate ${!product.enabled ? "opacity-60" : "cursor-pointer active-elevate-2"}`}
-                  onClick={() => product.enabled && setLocation(`/${product.slug}`)}
-                  data-testid={`card-product-${product.slug}`}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`rounded-full p-3 ${product.bgColor}`}>
-                        <product.icon className={`h-6 w-6 ${product.color}`} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{product.name}</h3>
-                          {!product.enabled && (
-                            <Badge variant="secondary" className="text-xs">
-                              Em breve
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {product.description}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle>Atividades</CardTitle>
@@ -310,6 +267,49 @@ export default function Home() {
             </Button>
           </CardContent>
         </Card>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Produtos</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {isLoadingCatalog ? (
+              <>
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+              </>
+            ) : (
+              products.map((product: any) => (
+                <Card
+                  key={product.slug}
+                  className={`hover-elevate ${!product.enabled ? "opacity-60" : "cursor-pointer active-elevate-2"}`}
+                  onClick={() => product.enabled && setLocation(`/${product.slug}`)}
+                  data-testid={`card-product-${product.slug}`}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className={`rounded-full p-3 ${product.bgColor}`}>
+                        <product.icon className={`h-6 w-6 ${product.color}`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">{product.name}</h3>
+                          {!product.enabled && (
+                            <Badge variant="secondary" className="text-xs">
+                              Em breve
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {product.description}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </div>
       </main>
 
       <div className="fixed bottom-4 right-4">
