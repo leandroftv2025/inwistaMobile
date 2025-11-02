@@ -1,4 +1,3 @@
-import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,7 +88,6 @@ export default function Support() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Logo size="sm" />
             <h1 className="font-semibold">Ajuda e Suporte</h1>
           </div>
           <ThemeToggle />
@@ -201,7 +199,11 @@ export default function Support() {
             </CardContent>
           </Card>
 
-          <Card className="hover-elevate">
+          <Card 
+            className="hover-elevate cursor-pointer active-elevate-2" 
+            onClick={() => window.open('https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/07/30/19/20250730192657-TWYHIX4W.json', '_blank')}
+            data-testid="button-chat"
+          >
             <CardContent className="p-6 text-center">
               <div className="rounded-full p-4 bg-primary/10 mx-auto w-fit mb-4">
                 <MessageCircle className="h-6 w-6 text-primary" />
