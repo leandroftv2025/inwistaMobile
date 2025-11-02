@@ -158,26 +158,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const amountNum = parseFloat(amount);
-      const rate = 5.25;
-      const fee = amountNum * 0.005;
+      const baseRate = 5.25;
+      const spread = 0.005;
 
       let newBalanceBRL = parseFloat(user.balanceBRL);
       let newBalanceStable = parseFloat(user.balanceStable);
 
       if (type === "buy") {
-        if (newBalanceBRL < amountNum + fee) {
+        const effectiveRate = baseRate * (1 + spread);
+        const spreadFee = amountNum * spread;
+        const totalDebit = amountNum + spreadFee;
+        
+        if (newBalanceBRL < totalDebit) {
           return res.status(400).json({ message: "Saldo BRL insuficiente" });
         }
-        newBalanceBRL -= amountNum + fee;
-        newBalanceStable += amountNum / rate;
+        
+        const stableReceived = amountNum / effectiveRate;
+        newBalanceBRL -= totalDebit;
+        newBalanceStable += stableReceived;
 
         const transaction = await storage.createStablecoinTransaction({
           userId,
           type: "buy",
           amountBRL: amountNum.toFixed(2),
-          amountStable: (amountNum / rate).toFixed(8),
-          rate: rate.toFixed(6),
-          fee: fee.toFixed(2),
+          amountStable: stableReceived.toFixed(8),
+          rate: effectiveRate.toFixed(6),
+          fee: spreadFee.toFixed(2),
         });
 
         await storage.updateUserBalance(
@@ -189,19 +195,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         res.json(transaction);
       } else {
+        const effectiveRate = baseRate * (1 - spread);
+        
         if (newBalanceStable < amountNum) {
           return res.status(400).json({ message: "Saldo Stable insuficiente" });
         }
+        
+        const brlAmount = amountNum * effectiveRate;
+        const spreadFee = brlAmount * spread;
+        const totalCredit = brlAmount - spreadFee;
+        
         newBalanceStable -= amountNum;
-        newBalanceBRL += amountNum * rate - fee;
+        newBalanceBRL += totalCredit;
 
         const transaction = await storage.createStablecoinTransaction({
           userId,
           type: "sell",
-          amountBRL: (amountNum * rate).toFixed(2),
+          amountBRL: brlAmount.toFixed(2),
           amountStable: amountNum.toFixed(8),
-          rate: rate.toFixed(6),
-          fee: fee.toFixed(2),
+          rate: effectiveRate.toFixed(6),
+          fee: spreadFee.toFixed(2),
         });
 
         await storage.updateUserBalance(
