@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/lib/theme-provider";
 import { useAuth } from "@/lib/auth-context";
+import { useLanguage } from "@/lib/language-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -10,20 +11,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, Moon, Sun, Monitor, Globe, Fingerprint, Lock, Shield, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const { logout } = useAuth();
-  const [language, setLanguage] = useState<string>("pt-BR");
 
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logout realizado",
-      description: "Até logo!",
+      title: t("settings.logoutConfirm"),
+      description: t("settings.logoutMessage"),
     });
     setTimeout(() => {
       setLocation("/");
@@ -43,7 +43,7 @@ export default function Settings() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="font-semibold">Configurações</h1>
+            <h1 className="font-semibold">{t("settings.title")}</h1>
           </div>
           <ThemeToggle />
         </div>
@@ -52,9 +52,9 @@ export default function Settings() {
       <main className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Conta</CardTitle>
+            <CardTitle>{t("settings.account")}</CardTitle>
             <CardDescription>
-              Informações da sua conta
+              {t("settings.accountInfo")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -64,7 +64,7 @@ export default function Settings() {
                 <p className="text-sm text-muted-foreground">ana@inwista.com</p>
               </div>
               <Button variant="outline" size="sm" data-testid="button-edit-profile">
-                Editar
+                {t("common.edit")}
               </Button>
             </div>
 
@@ -76,14 +76,14 @@ export default function Settings() {
                   <Lock className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-medium">Alterar senha</p>
+                  <p className="font-medium">{t("settings.changePassword")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Atualize sua senha de acesso
+                    {t("settings.changePasswordDesc")}
                   </p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" data-testid="button-change-password">
-                Alterar
+                {t("common.edit")}
               </Button>
             </div>
           </CardContent>
@@ -91,9 +91,9 @@ export default function Settings() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Aparência</CardTitle>
+            <CardTitle>{t("settings.appearance")}</CardTitle>
             <CardDescription>
-              Personalize a interface do aplicativo
+              {t("settings.appearanceDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -104,7 +104,7 @@ export default function Settings() {
                     <Sun className="h-4 w-4" />
                   </div>
                   <Label htmlFor="light" className="cursor-pointer">
-                    Claro
+                    {t("settings.light")}
                   </Label>
                 </div>
                 <RadioGroupItem value="light" id="light" data-testid="radio-theme-light" />
@@ -118,7 +118,7 @@ export default function Settings() {
                     <Moon className="h-4 w-4" />
                   </div>
                   <Label htmlFor="dark" className="cursor-pointer">
-                    Escuro
+                    {t("settings.dark")}
                   </Label>
                 </div>
                 <RadioGroupItem value="dark" id="dark" data-testid="radio-theme-dark" />
@@ -132,7 +132,7 @@ export default function Settings() {
                     <Monitor className="h-4 w-4" />
                   </div>
                   <Label htmlFor="system" className="cursor-pointer">
-                    Sistema
+                    {t("settings.system")}
                   </Label>
                 </div>
                 <RadioGroupItem value="system" id="system" data-testid="radio-theme-system" />
@@ -143,9 +143,9 @@ export default function Settings() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Preferências</CardTitle>
+            <CardTitle>{t("settings.preferences")}</CardTitle>
             <CardDescription>
-              Ajuste suas preferências de uso
+              {t("settings.preferencesDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -154,10 +154,10 @@ export default function Settings() {
                 <div className="rounded-full p-2 bg-muted">
                   <Globe className="h-4 w-4" />
                 </div>
-                <p className="font-medium">Idioma</p>
+                <p className="font-medium">{t("settings.language")}</p>
               </div>
               
-              <RadioGroup value={language} onValueChange={setLanguage}>
+              <RadioGroup value={language} onValueChange={(value) => setLanguage(value as any)}>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pt-BR" className="cursor-pointer">
                     Português (Brasil)
@@ -180,9 +180,9 @@ export default function Settings() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Segurança</CardTitle>
+            <CardTitle>{t("settings.security")}</CardTitle>
             <CardDescription>
-              Proteja sua conta com recursos avançados
+              {t("settings.securityDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -192,9 +192,9 @@ export default function Settings() {
                   <Fingerprint className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-medium">Biometria</p>
+                  <p className="font-medium">{t("settings.biometrics")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Acesso rápido com impressão digital
+                    {t("settings.biometricsDesc")}
                   </p>
                 </div>
               </div>
@@ -209,9 +209,9 @@ export default function Settings() {
                   <Shield className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-medium">Autenticação em duas etapas</p>
+                  <p className="font-medium">{t("settings.twoFactor")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Camada extra de proteção
+                    {t("settings.twoFactorDesc")}
                   </p>
                 </div>
               </div>
@@ -222,17 +222,17 @@ export default function Settings() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Privacidade</CardTitle>
+            <CardTitle>{t("settings.privacy")}</CardTitle>
             <CardDescription>
-              Gerencie seus dados e privacidade
+              {t("settings.privacyDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button variant="outline" className="w-full justify-start" data-testid="button-privacy-policy">
-              Política de privacidade
+              {t("settings.privacyPolicy")}
             </Button>
             <Button variant="outline" className="w-full justify-start" data-testid="button-terms">
-              Termos de uso
+              {t("settings.termsOfUse")}
             </Button>
           </CardContent>
         </Card>
@@ -246,13 +246,13 @@ export default function Settings() {
               data-testid="button-logout"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Sair da conta
+              {t("settings.logout")}
             </Button>
           </CardContent>
         </Card>
 
         <p className="text-center text-sm text-muted-foreground">
-          Versão 1.0.0
+          {t("settings.version")} 1.0.0
         </p>
       </main>
     </div>

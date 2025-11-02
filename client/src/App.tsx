@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { AuthProvider } from "@/lib/auth-context";
+import { LanguageProvider } from "@/lib/language-context";
 import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import TwoFA from "@/pages/two-fa";
@@ -39,12 +40,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="inwista-theme">
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
