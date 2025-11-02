@@ -1,9 +1,9 @@
-import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   ArrowDownLeft,
@@ -106,7 +106,6 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Logo size="sm" />
             <Badge variant="secondary" className="hidden sm:flex">
               Olá, {userData?.name?.split(' ')[0] || 'Usuário'}
             </Badge>
@@ -124,6 +123,20 @@ export default function Home() {
               <Settings className="h-5 w-5" />
             </Button>
             <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/profile")}
+              data-testid="button-profile"
+              className="rounded-full"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="" alt={userData?.name || 'Usuário'} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  {userData?.name?.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'US'}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
           </div>
         </div>
       </header>
