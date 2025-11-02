@@ -67,7 +67,6 @@ export default function Home() {
 
   const balance = parseFloat(userData?.balanceBRL || '0');
   const totalInvested = parseFloat(userData?.totalInvested || '0');
-  const returnAmount = totalInvested * 0.05;
   const netWorth = balance + parseFloat(userData?.balanceStable || '0') + totalInvested;
 
   const iconMap: Record<string, any> = {
@@ -162,10 +161,10 @@ export default function Home() {
               <>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Patrimônio</p>
+                    <p className="text-sm text-muted-foreground">Total investido</p>
                     <div className="flex items-center gap-3 mt-1">
-                      <p className="text-3xl font-bold font-mono tabular-nums" data-testid="text-balance">
-                        {showBalance ? formatCurrency(netWorth) : "••••••"}
+                      <p className="text-3xl font-bold font-mono tabular-nums" data-testid="text-invested">
+                        {showBalance ? formatCurrency(totalInvested) : "••••••"}
                       </p>
                       <Button
                         variant="ghost"
@@ -185,15 +184,15 @@ export default function Home() {
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total investido</p>
-                    <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-invested">
-                      {showBalance ? formatCurrency(totalInvested) : "••••••"}
+                    <p className="text-sm text-muted-foreground">Patrimônio</p>
+                    <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-networth">
+                      {showBalance ? formatCurrency(netWorth) : "••••••"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Rendimento</p>
-                    <p className="text-lg font-semibold font-mono tabular-nums text-green-600 dark:text-green-400" data-testid="text-return">
-                      {showBalance ? `+${formatCurrency(returnAmount)}` : "••••••"}
+                    <p className="text-sm text-muted-foreground">Saldo BRL</p>
+                    <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-balance-brl">
+                      {showBalance ? formatCurrency(balance) : "••••••"}
                     </p>
                   </div>
                 </div>
