@@ -27,6 +27,11 @@ export default function TwoFA() {
     }
   }, [setLocation]);
 
+  const handleBackToLogin = () => {
+    localStorage.removeItem("inwista-pending-auth");
+    setLocation("/login");
+  };
+
   const verifyMutation = useMutation({
     mutationFn: async (code: string) => {
       if (!pendingAuth?.userId) {
@@ -89,7 +94,7 @@ export default function TwoFA() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/login")}
+            onClick={handleBackToLogin}
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -98,7 +103,10 @@ export default function TwoFA() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation("/")}
+            onClick={() => {
+              localStorage.removeItem("inwista-pending-auth");
+              setLocation("/");
+            }}
             data-testid="button-close"
           >
             <X className="h-5 w-5" />
@@ -165,6 +173,10 @@ export default function TwoFA() {
                 <p className="text-xs text-muted-foreground mt-2">
                   O código foi enviado. Você pode pedir um novo em 17 segundos.
                 </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mt-3">
+                  <p className="font-medium text-blue-900 mb-1">Para demonstração:</p>
+                  <p className="text-blue-800">Digite qualquer código de <span className="font-mono font-semibold">8 dígitos</span></p>
+                </div>
               </div>
 
               <Button

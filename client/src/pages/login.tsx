@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CPFInput } from "@/components/cpf-input";
 import { useLocation } from "wouter";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,6 +16,10 @@ export default function Login() {
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    localStorage.removeItem("inwista-pending-auth");
+  }, []);
 
   const loginMutation = useMutation({
     mutationFn: async (data: { cpf: string; password: string }) => {
@@ -70,17 +74,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setLocation("/")}
-          className="mb-4 text-white hover:bg-white/10"
-          data-testid="button-back"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
-        </Button>
-
         <Card className="bg-white">
           <CardHeader className="space-y-4 pt-8 pb-6">
             <div className="space-y-3 text-center">
@@ -118,15 +111,15 @@ export default function Login() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full"
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-2"
                     onClick={() => setShowPassword(!showPassword)}
                     data-testid="button-toggle-password"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </Button>
                 </div>
