@@ -35,7 +35,20 @@ export default function Welcome() {
         </div>
       </div>
 
-      <div className="pb-6 px-6">
+      <div className="pb-6 px-6 space-y-4">
+        <div className="flex justify-center">
+          <a 
+            href="https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/07/30/19/20250730192657-TWYHIX4W.json"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+            data-testid="link-help"
+          >
+            <HelpCircle className="h-5 w-5" />
+            <span className="text-sm font-medium">Precisa de ajuda?</span>
+          </a>
+        </div>
+        
         <p className="text-center text-xs text-white/60">
           Ao continuar, você concorda com nossos{" "}
           <a href="#" className="underline hover:text-white/80">
@@ -46,19 +59,6 @@ export default function Welcome() {
             Política de privacidade
           </a>
         </p>
-      </div>
-
-      <div className="fixed bottom-6 right-6 z-10">
-        <a 
-          href="https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/07/30/19/20250730192657-TWYHIX4W.json"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm"
-          data-testid="link-help"
-        >
-          <HelpCircle className="h-5 w-5" />
-          <span className="text-sm font-medium">Precisa de ajuda?</span>
-        </a>
       </div>
     </div>
   );
