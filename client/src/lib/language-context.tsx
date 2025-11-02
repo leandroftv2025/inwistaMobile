@@ -12,12 +12,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem("language");
-    return (saved as Language) || "pt-BR";
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("language");
+      return (saved as Language) || "pt-BR";
+    }
+    return "pt-BR";
   });
 
   useEffect(() => {
-    localStorage.setItem("language", language);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("language", language);
+    }
   }, [language]);
 
   const setLanguage = (newLanguage: Language) => {
@@ -79,6 +84,8 @@ const translations = {
       recentTransactions: "Transações recentes",
       viewAll: "Ver todas",
       noTransactions: "Nenhuma transação recente",
+      noActivity: "Nenhuma atividade recente",
+      invest: "Investir",
     },
     pix: {
       title: "PIX",
@@ -101,6 +108,8 @@ const translations = {
       sent: "Enviada",
       received: "Recebida",
       insufficientBalance: "Saldo insuficiente",
+      transferSent: "Transferência enviada",
+      transferReceived: "Transferência recebida",
     },
     stablecoin: {
       title: "StableCOIN",
@@ -117,6 +126,8 @@ const translations = {
       purchaseSuccess: "Compra realizada com sucesso!",
       saleSuccess: "Venda realizada com sucesso!",
       spread: "Spread aplicado",
+      purchaseDescription: "Compra de stable",
+      saleDescription: "Venda de stable",
     },
     investments: {
       title: "Investimentos",
@@ -202,6 +213,8 @@ const translations = {
       recentTransactions: "Recent Transactions",
       viewAll: "View All",
       noTransactions: "No recent transactions",
+      noActivity: "No recent activity",
+      invest: "Invest",
     },
     pix: {
       title: "PIX",
@@ -224,6 +237,8 @@ const translations = {
       sent: "Sent",
       received: "Received",
       insufficientBalance: "Insufficient balance",
+      transferSent: "Transfer sent",
+      transferReceived: "Transfer received",
     },
     stablecoin: {
       title: "StableCOIN",
@@ -240,6 +255,8 @@ const translations = {
       purchaseSuccess: "Purchase completed successfully!",
       saleSuccess: "Sale completed successfully!",
       spread: "Spread Applied",
+      purchaseDescription: "Stable purchase",
+      saleDescription: "Stable sale",
     },
     investments: {
       title: "Investments",

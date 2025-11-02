@@ -23,6 +23,7 @@ import {
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
+import { useLanguage } from "@/lib/language-context";
 import { useQuery } from "@tanstack/react-query";
 import type { User, PixTransaction, StablecoinTransaction, Investment } from "@shared/schema";
 
@@ -30,6 +31,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [showBalance, setShowBalance] = useState(true);
   const { user, isAuthenticated, isInitialized } = useAuth();
+  const { t } = useLanguage();
   const userId = user?.id;
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function Home() {
     ...pixTransactions.map((tx) => ({
       id: `pix-${tx.id}`,
       type: tx.type === 'sent' ? 'pix-sent' : 'pix-received',
-      description: tx.type === 'sent' ? 'Transferência enviada' : 'Transferência recebida',
+      description: tx.type === 'sent' ? t('pix.transferSent') : t('pix.transferReceived'),
       name: tx.recipientKey || tx.description || 'PIX',
       amount: tx.type === 'sent' ? -parseFloat(tx.amount) : parseFloat(tx.amount),
       date: new Date(tx.createdAt),
@@ -120,7 +122,7 @@ export default function Home() {
     ...stablecoinTransactions.map((tx) => ({
       id: `stable-${tx.id}`,
       type: 'stablecoin',
-      description: tx.type === 'buy' ? 'Compra de stable' : 'Venda de stable',
+      description: tx.type === 'buy' ? t('stablecoin.purchaseDescription') : t('stablecoin.saleDescription'),
       name: 'StableCOIN',
       amount: tx.type === 'buy' ? -parseFloat(tx.amountBRL || '0') : parseFloat(tx.amountBRL || '0'),
       date: new Date(tx.createdAt),
@@ -148,7 +150,7 @@ export default function Home() {
               </Avatar>
             </Button>
             <Badge variant="secondary" className="hidden sm:flex">
-              Olá, {userData?.name?.split(' ')[0] || 'Usuário'}
+              {t("common.hello")}, {userData?.name?.split(' ')[0] || 'Usuário'}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
@@ -180,7 +182,7 @@ export default function Home() {
               <>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Saldo BRL</p>
+                    <p className="text-sm text-muted-foreground">{t("home.balance")}</p>
                     <div className="flex items-center gap-3 mt-1">
                       <p className="text-3xl font-bold font-mono tabular-nums" data-testid="text-balance-brl">
                         {showBalance ? formatCurrency(balance) : "••••••"}
@@ -203,13 +205,13 @@ export default function Home() {
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div>
-                    <p className="text-sm text-muted-foreground">Patrimônio</p>
+                    <p className="text-sm text-muted-foreground">{t("home.netWorth")}</p>
                     <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-networth">
                       {showBalance ? formatCurrency(netWorth) : "••••••"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total investido</p>
+                    <p className="text-sm text-muted-foreground">{t("home.totalInvested")}</p>
                     <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-invested">
                       {showBalance ? formatCurrency(totalInvested) : "••••••"}
                     </p>
@@ -221,11 +223,11 @@ export default function Home() {
             <div className="flex gap-2 pt-2">
               <Button variant="default" className="flex-1" onClick={() => setLocation("/pix")} data-testid="button-quick-pix">
                 <Zap className="h-4 w-4 mr-2" />
-                PIX
+                {t("pix.title")}
               </Button>
               <Button variant="outline" className="flex-1" onClick={() => setLocation("/investments")} data-testid="button-quick-invest">
                 <PiggyBank className="h-4 w-4 mr-2" />
-                Investir
+                {t("home.invest")}
               </Button>
             </div>
           </CardContent>
@@ -233,8 +235,7 @@ export default function Home() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Atividades</CardTitle>
-            <CardDescription>Transações recentes</CardDescription>
+            <CardTitle>{t("home.recentTransactions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoadingPix || isLoadingStable ? (
@@ -245,7 +246,7 @@ export default function Home() {
               </div>
             ) : allTransactions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                Nenhuma atividade recente
+                {t("home.noActivity")}
               </p>
             ) : (
               allTransactions.map((activity) => (
