@@ -76,8 +76,7 @@ export class MemStorage implements IStorage {
 
     const pixKeyTypes = [
       { type: "cpf", value: "123.456.789-00" },
-      { type: "email", value: "ana@inwista.com" },
-      { type: "phone", value: "(11) 98765-4321" },
+      { type: "random", value: "3f8a9b2c-4d1e-5f6a-7b8c-9d0e1f2a3b4c" },
     ];
 
     pixKeyTypes.forEach(({ type, value }) => {
