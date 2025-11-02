@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CPFInput } from "@/components/cpf-input";
 import { useLocation } from "wouter";
-import { ArrowLeft, Eye, EyeOff, HelpCircle } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -69,44 +68,42 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setLocation("/")}
-          className="mb-4"
+          className="mb-4 text-white hover:bg-white/10"
           data-testid="button-back"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
 
-        <Card>
-          <CardHeader className="space-y-4">
-            <div className="flex justify-center">
-              <Logo size="md" />
-            </div>
-            <div className="space-y-2 text-center">
-              <CardTitle className="text-2xl">Para começar, qual é o número do seu CPF?</CardTitle>
-              <CardDescription>Digite seu CPF</CardDescription>
+        <Card className="bg-white">
+          <CardHeader className="space-y-4 pt-8 pb-6">
+            <div className="space-y-3 text-center">
+              <CardTitle className="text-2xl font-medium">Para começar, qual é o número do seu CPF?</CardTitle>
+              <CardDescription className="text-base">Digite seu CPF e senha</CardDescription>
             </div>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="px-8 pb-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="cpf">CPF</Label>
+                <Label htmlFor="cpf" className="text-base">CPF</Label>
                 <CPFInput
                   id="cpf"
                   value={cpf}
                   onChange={setCpf}
                   disabled={loginMutation.isPending}
                   autoFocus
+                  className="h-12 text-base"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Qual a sua senha de acesso?</Label>
+                <Label htmlFor="password" className="text-base">Qual a sua senha de acesso?</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -115,6 +112,7 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loginMutation.isPending}
                     placeholder="Digite sua senha"
+                    className="h-12 text-base pr-12"
                     data-testid="input-password"
                   />
                   <Button
@@ -134,19 +132,26 @@ export default function Login() {
                 </div>
               </div>
 
+              <div className="pt-2 space-y-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+                  <p className="font-medium text-blue-900 mb-1">Credenciais de demonstração:</p>
+                  <p className="text-blue-800">CPF: <span className="font-mono font-semibold">123.456.789-00</span></p>
+                  <p className="text-blue-800">Senha: <span className="font-mono font-semibold">123456</span></p>
+                </div>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full min-h-12 text-base font-medium"
                 disabled={loginMutation.isPending}
                 data-testid="button-submit"
               >
                 {loginMutation.isPending ? "Entrando..." : "Continuar"}
               </Button>
 
-              <Button
+              <button
                 type="button"
-                variant="link"
-                className="w-full text-sm"
+                className="w-full text-base text-primary hover:underline"
                 onClick={() => {
                   toast({
                     title: "Recuperação de senha",
@@ -156,10 +161,10 @@ export default function Login() {
                 data-testid="link-forgot-password"
               >
                 Esqueci minha senha
-              </Button>
+              </button>
             </form>
 
-            <div className="mt-6 pt-6 border-t">
+            <div className="mt-8 pt-6 border-t">
               <p className="text-sm text-muted-foreground text-center">
                 Ao continuar, estou de acordo com a{" "}
                 <a href="#" className="text-primary hover:underline">
@@ -170,13 +175,6 @@ export default function Login() {
                   Termos de uso
                 </a>
               </p>
-            </div>
-
-            <div className="fixed bottom-4 right-4">
-              <Button variant="outline" size="icon" className="rounded-full h-14 w-14" data-testid="button-help">
-                <HelpCircle className="h-6 w-6" />
-              </Button>
-              <p className="text-xs text-center mt-1">Precisa de<br />ajuda?</p>
             </div>
           </CardContent>
         </Card>
