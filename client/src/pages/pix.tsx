@@ -190,7 +190,7 @@ export default function PIX() {
   const downloadQRCode = () => {
     if (pixKeys.length === 0) return;
     
-    const qrCodeUrl = generateQRCode(pixKeys[0].value);
+    const qrCodeUrl = generateQRCode(pixKeys[0].keyValue);
     const link = document.createElement('a');
     link.href = qrCodeUrl;
     link.download = 'qrcode-pix.png';
