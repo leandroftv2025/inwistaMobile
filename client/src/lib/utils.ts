@@ -28,8 +28,10 @@ export function formatCurrency(value: number | string, currency: string = "BRL")
   }).format(numValue);
 }
 
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string | undefined): string {
+  if (!date) return "--/--/----";
   const d = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "--/--/----";
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -37,8 +39,10 @@ export function formatDate(date: Date | string): string {
   }).format(d);
 }
 
-export function formatDateTime(date: Date | string): string {
+export function formatDateTime(date: Date | string | undefined): string {
+  if (!date) return "--/--/---- --:--";
   const d = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "--/--/---- --:--";
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -60,13 +64,14 @@ export function formatPixKey(keyType: string, keyValue: string): string {
   return keyValue;
 }
 
-export function generateQRCode(pixKey: string): string {
+export function generateQRCode(pixKey: string | undefined): string {
+  const keyText = pixKey ? pixKey.substring(0, 20) : "---";
   return `data:image/svg+xml,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
       <rect width="256" height="256" fill="white"/>
       <rect x="16" y="16" width="224" height="224" fill="black" opacity="0.1"/>
       <text x="128" y="128" text-anchor="middle" font-family="monospace" font-size="12" fill="black">
-        QR Code: ${pixKey.substring(0, 20)}
+        QR Code: ${keyText}
       </text>
     </svg>
   `)}`;

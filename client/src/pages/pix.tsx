@@ -55,7 +55,7 @@ export default function PIX() {
   });
 
   const sendPixMutation = useMutation({
-    mutationFn: async (data: { userId: string; recipientKey: string; amount: number; description?: string }) => {
+    mutationFn: async (data: { userId: string; recipientKey: string; amount: string; description?: string }) => {
       const response = await apiRequest("/api/pix/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,7 +109,7 @@ export default function PIX() {
     sendPixMutation.mutate({
       userId: userId!,
       recipientKey,
-      amount: parseFloat(amount),
+      amount: amount,
       description: description || undefined,
     });
   };
