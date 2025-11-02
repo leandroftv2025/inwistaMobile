@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -8,79 +8,78 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, TrendingUp, Shield, Clock, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Investments() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, isAuthenticated, isInitialized } = useAuth();
+  const userId = user?.id;
   const [activeTab, setActiveTab] = useState("products");
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState("");
 
-  const products = [
-    {
-      id: "1",
-      name: "CDB Liquidez Diária",
-      category: "Renda Fixa",
-      risk: "Baixo",
-      expectedReturn: 12.5,
-      minimum: 100,
-      liquidity: "Liquidez diária",
-      description: "Invista com segurança e liquidez imediata",
-    },
-    {
-      id: "2",
-      name: "Fundo Multimercado",
-      category: "Fundos",
-      risk: "Médio",
-      expectedReturn: 15.8,
-      minimum: 500,
-      liquidity: "D+30",
-      description: "Diversificação com gestão profissional",
-    },
-    {
-      id: "3",
-      name: "Tesouro Selic",
-      category: "Renda Fixa",
-      risk: "Baixo",
-      expectedReturn: 11.2,
-      minimum: 50,
-      liquidity: "D+1",
-      description: "Investimento mais seguro do Brasil",
-    },
-    {
-      id: "4",
-      name: "Ações Tech",
-      category: "Renda Variável",
-      risk: "Alto",
-      expectedReturn: 22.5,
-      minimum: 1000,
-      liquidity: "D+2",
-      description: "Potencial de alta rentabilidade",
-    },
-  ];
+  const safeNumber = (value: any): number => {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  };
 
-  const myInvestments = [
-    {
-      id: "1",
-      productName: "CDB Liquidez Diária",
-      amount: 5000,
-      currentValue: 5287.50,
-      return: 287.50,
-      returnPercentage: 5.75,
+  useEffect(() => {
+    if (isInitialized && !isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [isInitialized, isAuthenticated, setLocation]);
+
+  const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery({
+    queryKey: ['/api/investments/products'],
+    enabled: isInitialized && isAuthenticated && !!userId,
+  });
+
+  const { data: myInvestments = [], isLoading: isLoadingPortfolio, error: portfolioError } = useQuery({
+    queryKey: [`/api/investments/portfolio/${userId}`],
+    enabled: isInitialized && isAuthenticated && !!userId,
+  });
+
+  const investMutation = useMutation({
+    mutationFn: async (data: { userId: string; productId: string; amount: string }) => {
+      const response = await apiRequest("/api/investments/invest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Erro desconhecido" }));
+        throw new Error(errorData.message || "Erro ao processar investimento");
+      }
+      return response.json();
     },
-    {
-      id: "2",
-      productName: "Tesouro Selic",
-      amount: 3500,
-      currentValue: 3638.25,
-      return: 138.25,
-      returnPercentage: 3.95,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/investments/portfolio/${userId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/user/${userId}`] });
+      
+      toast({
+        title: "Investimento realizado!",
+        description: `${formatCurrency(parseFloat(investmentAmount))} aplicado com sucesso`,
+      });
+      
+      setSelectedProduct(null);
+      setInvestmentAmount("");
     },
-  ];
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro no investimento",
+        description: error.message || "Não foi possível realizar o investimento",
+      });
+    },
+  });
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -105,24 +104,56 @@ export default function Investments() {
       return;
     }
 
-    const product = products.find(p => p.id === selectedProduct);
-    if (product && parseFloat(investmentAmount) < product.minimum) {
+    if (!userId) {
       toast({
         variant: "destructive",
-        title: "Valor mínimo",
-        description: `O valor mínimo para este investimento é ${formatCurrency(product.minimum)}`,
+        title: "Erro",
+        description: "Usuário não autenticado",
       });
       return;
     }
 
-    toast({
-      title: "Investimento realizado!",
-      description: `${formatCurrency(parseFloat(investmentAmount))} aplicado com sucesso`,
-    });
+    const product = products.find((p: any) => p.id === selectedProduct);
+    const minimumAmount = safeNumber(product?.minimum);
+    
+    if (product && safeNumber(investmentAmount) < minimumAmount) {
+      toast({
+        variant: "destructive",
+        title: "Valor mínimo",
+        description: `O valor mínimo para este investimento é ${formatCurrency(minimumAmount)}`,
+      });
+      return;
+    }
 
-    setSelectedProduct(null);
-    setInvestmentAmount("");
+    investMutation.mutate({
+      userId,
+      productId: selectedProduct,
+      amount: investmentAmount,
+    });
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-10 w-10" />
+              <Skeleton className="h-6 w-32" />
+            </div>
+            <Skeleton className="h-10 w-10" />
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,7 +195,31 @@ export default function Investments() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {products.map((product) => (
+                {isLoadingProducts ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                  </div>
+                ) : productsError ? (
+                  <div className="text-center py-8 space-y-4">
+                    <p className="text-destructive">
+                      Erro ao carregar produtos.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/investments/products'] })}
+                      data-testid="button-retry-products"
+                    >
+                      Tentar novamente
+                    </Button>
+                  </div>
+                ) : products.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhum produto disponível no momento
+                  </p>
+                ) : (
+                  products.map((product: any) => (
                   <Card
                     key={product.id}
                     className="hover-elevate cursor-pointer active-elevate-2"
@@ -185,7 +240,7 @@ export default function Investments() {
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-green-600 dark:text-green-400 font-mono tabular-nums">
-                            +{product.expectedReturn}%
+                            +{safeNumber(product.expectedReturn)}%
                           </p>
                           <p className="text-xs text-muted-foreground">ao ano</p>
                         </div>
@@ -201,7 +256,7 @@ export default function Investments() {
                         <div>
                           <p className="text-xs text-muted-foreground">Mínimo</p>
                           <p className="font-semibold font-mono tabular-nums">
-                            {formatCurrency(product.minimum)}
+                            {formatCurrency(safeNumber(product.minimum))}
                           </p>
                         </div>
                         <div>
@@ -229,23 +284,23 @@ export default function Investments() {
                                 onChange={(e) => setInvestmentAmount(e.target.value)}
                                 className="pl-10"
                                 step="0.01"
-                                min={product.minimum}
+                                min={safeNumber(product.minimum)}
                                 data-testid="input-investment-amount"
                                 onClick={(e) => e.stopPropagation()}
                               />
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              Mínimo: {formatCurrency(product.minimum)}
+                              Mínimo: {formatCurrency(safeNumber(product.minimum))}
                             </p>
                           </div>
 
-                          {investmentAmount && parseFloat(investmentAmount) >= product.minimum && (
+                          {investmentAmount && safeNumber(investmentAmount) >= safeNumber(product.minimum) && (
                             <Card className="bg-muted">
                               <CardContent className="p-4 space-y-2">
                                 <div className="flex items-center justify-between">
                                   <p className="text-sm text-muted-foreground">Rendimento estimado (1 ano)</p>
                                   <p className="font-semibold font-mono tabular-nums text-green-600 dark:text-green-400">
-                                    +{formatCurrency(parseFloat(investmentAmount) * (product.expectedReturn / 100))}
+                                    +{formatCurrency(safeNumber(investmentAmount) * (safeNumber(product.expectedReturn) / 100))}
                                   </p>
                                 </div>
                               </CardContent>
@@ -258,15 +313,17 @@ export default function Investments() {
                               e.stopPropagation();
                               handleInvest();
                             }}
+                            disabled={investMutation.isPending}
                             data-testid="button-confirm-investment"
                           >
-                            Investir agora
+                            {investMutation.isPending ? "Processando..." : "Investir agora"}
                           </Button>
                         </div>
                       )}
                     </CardContent>
                   </Card>
-                ))}
+                ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -274,20 +331,27 @@ export default function Investments() {
           <TabsContent value="portfolio" className="space-y-4">
             <Card className="bg-gradient-to-br from-chart-3/10 via-chart-3/5 to-transparent">
               <CardContent className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total investido</p>
-                    <p className="text-2xl font-bold font-mono tabular-nums" data-testid="text-total-invested">
-                      {formatCurrency(myInvestments.reduce((sum, inv) => sum + inv.amount, 0))}
-                    </p>
+                {isLoadingPortfolio ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Rendimento total</p>
-                    <p className="text-2xl font-bold font-mono tabular-nums text-green-600 dark:text-green-400" data-testid="text-total-return">
-                      +{formatCurrency(myInvestments.reduce((sum, inv) => sum + inv.return, 0))}
-                    </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total investido</p>
+                      <p className="text-2xl font-bold font-mono tabular-nums" data-testid="text-total-invested">
+                        {formatCurrency(myInvestments.reduce((sum: number, inv: any) => sum + safeNumber(inv.amount), 0))}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Rendimento total</p>
+                      <p className="text-2xl font-bold font-mono tabular-nums text-green-600 dark:text-green-400" data-testid="text-total-return">
+                        +{formatCurrency(myInvestments.reduce((sum: number, inv: any) => sum + safeNumber(inv.return), 0))}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -299,32 +363,57 @@ export default function Investments() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {myInvestments.map((investment) => (
-                  <div key={investment.id} data-testid={`investment-${investment.id}`}>
-                    <div className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-full p-2 bg-chart-3/10">
-                          <TrendingUp className="h-4 w-4 text-chart-3" />
+                {isLoadingPortfolio ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                ) : portfolioError ? (
+                  <div className="text-center py-8 space-y-4">
+                    <p className="text-destructive">
+                      Erro ao carregar portfólio.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => queryClient.invalidateQueries({ queryKey: [`/api/investments/portfolio/${userId}`] })}
+                      data-testid="button-retry-portfolio"
+                    >
+                      Tentar novamente
+                    </Button>
+                  </div>
+                ) : myInvestments.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Você ainda não possui investimentos
+                  </p>
+                ) : (
+                  myInvestments.map((investment: any) => (
+                    <div key={investment.id} data-testid={`investment-${investment.id}`}>
+                      <div className="flex items-center justify-between py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="rounded-full p-2 bg-chart-3/10">
+                            <TrendingUp className="h-4 w-4 text-chart-3" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{investment.productName}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Investido: {formatCurrency(safeNumber(investment.amount))}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">{investment.productName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Investido: {formatCurrency(investment.amount)}
+                        <div className="text-right">
+                          <p className="font-semibold font-mono tabular-nums">
+                            {formatCurrency(safeNumber(investment.currentValue))}
+                          </p>
+                          <p className="text-sm font-semibold font-mono tabular-nums text-green-600 dark:text-green-400">
+                            +{formatCurrency(safeNumber(investment.return))} ({safeNumber(investment.returnPercentage).toFixed(2)}%)
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold font-mono tabular-nums">
-                          {formatCurrency(investment.currentValue)}
-                        </p>
-                        <p className="text-sm font-semibold font-mono tabular-nums text-green-600 dark:text-green-400">
-                          +{formatCurrency(investment.return)} ({investment.returnPercentage.toFixed(2)}%)
-                        </p>
-                      </div>
+                      <Separator />
                     </div>
-                    <Separator />
-                  </div>
-                ))}
+                  ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
