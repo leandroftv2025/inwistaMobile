@@ -58,7 +58,8 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    const userId = randomUUID();
+    // Use fixed UUID to maintain consistency across server restarts
+    const userId = "97d51a63-be52-462f-96cc-419c00a7c04c";
     const user: User = {
       id: userId,
       cpf: "123.456.789-00",

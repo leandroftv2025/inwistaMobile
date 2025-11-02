@@ -216,8 +216,10 @@ export default function PIX() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="font-semibold">PIX</h1>
-          <ThemeToggle />
+          <div className="flex items-center gap-4">
+            <h1 className="font-semibold">PIX</h1>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
