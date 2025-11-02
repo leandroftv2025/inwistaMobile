@@ -14,6 +14,7 @@ import StableCOIN from "@/pages/stablecoin";
 import Investments from "@/pages/investments";
 import Settings from "@/pages/settings";
 import Support from "@/pages/support";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/investments" component={Investments} />
       <Route path="/settings" component={Settings} />
       <Route path="/support" component={Support} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );

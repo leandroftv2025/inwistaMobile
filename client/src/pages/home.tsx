@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
+import type { User, PixTransaction, StablecoinTransaction } from "@shared/schema";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -37,29 +38,37 @@ export default function Home() {
     }
   }, [isInitialized, isAuthenticated, setLocation]);
 
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
+  const { data: userData, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: [`/api/user/${userId}`],
     enabled: !!userId,
   });
 
-  const { data: pixTransactions = [], isLoading: isLoadingPix } = useQuery({
+  const { data: pixTransactions = [], isLoading: isLoadingPix } = useQuery<PixTransaction[]>({
     queryKey: [`/api/pix/transactions/${userId}`],
     enabled: !!userId,
   });
 
-  const { data: stablecoinTransactions = [], isLoading: isLoadingStable } = useQuery({
+  const { data: stablecoinTransactions = [], isLoading: isLoadingStable } = useQuery<StablecoinTransaction[]>({
     queryKey: [`/api/stablecoin/transactions/${userId}`],
     enabled: !!userId,
   });
 
-  const { data: catalogData = [], isLoading: isLoadingCatalog } = useQuery({
+  interface CatalogItem {
+    slug: string;
+    name: string;
+    category: string;
+    short: string;
+    enabled: boolean;
+  }
+
+  const { data: catalogData = [], isLoading: isLoadingCatalog } = useQuery<CatalogItem[]>({
     queryKey: ['/api/catalog'],
   });
 
-  const balance = userData?.balanceBRL ?? 0;
-  const totalInvested = userData?.totalInvested ?? 0;
+  const balance = parseFloat(userData?.balanceBRL || '0');
+  const totalInvested = parseFloat(userData?.totalInvested || '0');
   const returnAmount = totalInvested * 0.05;
-  const netWorth = balance + (userData?.balanceStable ?? 0) + totalInvested;
+  const netWorth = balance + parseFloat(userData?.balanceStable || '0') + totalInvested;
 
   const iconMap: Record<string, any> = {
     "pix": { icon: Zap, color: "text-primary", bgColor: "bg-primary/10" },
@@ -71,8 +80,8 @@ export default function Home() {
   };
 
   const products = catalogData
-    .filter((p: any) => p.slug !== 'support')
-    .map((product: any) => ({
+    .filter((p) => p.slug !== 'support')
+    .map((product) => ({
       ...product,
       description: product.short,
       icon: iconMap[product.slug]?.icon || HelpCircle,
@@ -81,22 +90,22 @@ export default function Home() {
     }));
 
   const allTransactions = [
-    ...pixTransactions.map((tx: any) => ({
+    ...pixTransactions.map((tx) => ({
       id: `pix-${tx.id}`,
-      type: tx.direction === 'sent' ? 'pix-sent' : 'pix-received',
-      description: tx.direction === 'sent' ? 'Transferência enviada' : 'Transferência recebida',
+      type: tx.type === 'sent' ? 'pix-sent' : 'pix-received',
+      description: tx.type === 'sent' ? 'Transferência enviada' : 'Transferência recebida',
       name: tx.recipientKey || tx.description || 'PIX',
-      amount: tx.direction === 'sent' ? -tx.amount : tx.amount,
-      date: new Date(tx.timestamp),
-      positive: tx.direction === 'received',
+      amount: tx.type === 'sent' ? -parseFloat(tx.amount) : parseFloat(tx.amount),
+      date: new Date(tx.createdAt),
+      positive: tx.type === 'received',
     })),
-    ...stablecoinTransactions.map((tx: any) => ({
+    ...stablecoinTransactions.map((tx) => ({
       id: `stable-${tx.id}`,
       type: 'stablecoin',
       description: tx.type === 'buy' ? 'Compra de stable' : 'Venda de stable',
       name: 'StableCOIN',
-      amount: tx.type === 'buy' ? -tx.amountBRL : tx.amountBRL,
-      date: new Date(tx.timestamp),
+      amount: tx.type === 'buy' ? -parseFloat(tx.amountBRL || '0') : parseFloat(tx.amountBRL || '0'),
+      date: new Date(tx.createdAt),
       positive: tx.type === 'sell',
     })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
@@ -133,7 +142,7 @@ export default function Home() {
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" alt={userData?.name || 'Usuário'} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {userData?.name?.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'US'}
+                  {userData?.name?.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase() || 'US'}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -296,7 +305,7 @@ export default function Home() {
               ))
             )}
 
-            <Button variant="link" className="w-full" data-testid="button-view-all">
+            <Button variant="ghost" className="w-full" data-testid="button-view-all">
               Ver todas as atividades
             </Button>
           </CardContent>
