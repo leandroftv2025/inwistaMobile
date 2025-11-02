@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Logo } from "@/components/logo";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +30,39 @@ export default function StableCOIN() {
       setLocation('/login');
     }
   }, [isInitialized, isAuthenticated, setLocation]);
+
+  // Format currency input with Brazilian formatting
+  const formatBRLInput = (value: string) => {
+    // Remove tudo exceto números
+    const numbers = value.replace(/\D/g, '');
+    
+    if (!numbers) return '';
+    
+    // Converte para centavos
+    const cents = parseInt(numbers, 10);
+    
+    // Formata com separadores brasileiros
+    const reais = (cents / 100).toFixed(2);
+    const [intPart, decPart] = reais.split('.');
+    
+    // Adiciona pontos de milhar
+    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    return `${formattedInt},${decPart}`;
+  };
+
+  // Parse Brazilian formatted currency to number
+  const parseBRLInput = (value: string): number => {
+    if (!value) return 0;
+    // Remove pontos e substitui vírgula por ponto
+    const cleaned = value.replace(/\./g, '').replace(',', '.');
+    return parseFloat(cleaned) || 0;
+  };
+
+  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatBRLInput(e.target.value);
+    setAmount(formatted);
+  };
 
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: [`/api/user/${userId}`],
@@ -85,7 +117,9 @@ export default function StableCOIN() {
   });
 
   const handleTrade = () => {
-    if (!amount || parseFloat(amount) <= 0) {
+    const numericAmount = parseBRLInput(amount);
+    
+    if (!amount || numericAmount <= 0) {
       toast({
         variant: "destructive",
         title: "Valor inválido",
@@ -106,7 +140,7 @@ export default function StableCOIN() {
     convertMutation.mutate({
       userId,
       type: tradeType,
-      amount,
+      amount: numericAmount.toString(),
     });
   };
 
@@ -146,7 +180,6 @@ export default function StableCOIN() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Logo size="sm" />
             <h1 className="font-semibold">StableCOIN</h1>
           </div>
           <ThemeToggle />
@@ -177,7 +210,10 @@ export default function StableCOIN() {
                   <div>
                     <p className="text-sm text-muted-foreground">Saldo Stable</p>
                     <p className="text-2xl font-bold font-mono tabular-nums" data-testid="text-balance-stable">
-                      {formatCurrency(balanceStable, "STABLE")}
+                      {new Intl.NumberFormat("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(balanceStable)}
                     </p>
                   </div>
                 </div>
@@ -245,19 +281,18 @@ export default function StableCOIN() {
                         </span>
                         <Input
                           id="amount"
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           placeholder="0,00"
                           value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
+                          onChange={handleAmountChange}
                           className={tradeType === "buy" ? "pl-10" : ""}
-                          step="0.01"
-                          min="0"
                           data-testid="input-amount"
                         />
                       </div>
                     </div>
 
-                    {amount && parseFloat(amount) > 0 && (
+                    {amount && parseBRLInput(amount) > 0 && (
                       <Card className="bg-muted">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
@@ -266,14 +301,14 @@ export default function StableCOIN() {
                             </p>
                             <p className="font-semibold font-mono tabular-nums" data-testid="text-converted">
                               {tradeType === "buy"
-                                ? formatCurrency(parseFloat(amount) / rate, "STABLE")
-                                : formatCurrency(parseFloat(amount) * rate)}
+                                ? formatCurrency(parseBRLInput(amount) / rate, "STABLE")
+                                : formatCurrency(parseBRLInput(amount) * rate)}
                             </p>
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <p className="text-muted-foreground">Taxa</p>
                             <p className="font-mono tabular-nums">
-                              {formatCurrency(parseFloat(amount) * 0.005)}
+                              {formatCurrency(parseBRLInput(amount) * 0.005)}
                             </p>
                           </div>
                         </CardContent>
