@@ -81,21 +81,21 @@ export default function TwoFA() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-6">
+      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
-          <CardHeader className="space-y-4">
+          <CardHeader className="space-y-3 px-4 py-6 md:px-6 md:py-8">
             <div className="space-y-2">
-              <CardTitle className="text-xl">Vamos ativar o token no seu novo dispositivo</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-lg md:text-xl leading-tight">Vamos ativar o token no seu novo dispositivo</CardTitle>
+              <CardDescription className="text-sm md:text-base">
                 É só continuar para receber um código de validação por e-mail e SMS.
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-4 pb-6 md:px-6 md:pb-8">
             <Button
               variant="default"
-              className="w-full"
+              className="w-full min-h-11 md:min-h-12 text-base font-medium"
               onClick={() => {
                 toast({
                   title: "Código enviado!",
@@ -107,7 +107,7 @@ export default function TwoFA() {
               Continuar
             </Button>
 
-            <div className="relative my-6">
+            <div className="relative my-5 md:my-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -119,9 +119,9 @@ export default function TwoFA() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="code">É só digitar o código de 8 dígitos que enviamos por SMS e e-mail</Label>
-                <div className="text-sm text-muted-foreground mb-2">
+              <div className="space-y-3">
+                <Label htmlFor="code" className="text-sm md:text-base leading-snug">É só digitar o código de 8 dígitos que enviamos por SMS e e-mail</Label>
+                <div className="text-xs md:text-sm text-muted-foreground">
                   <a href="#" className="text-primary hover:underline">
                     Conferir e-mail ou celular cadastrado
                   </a>
@@ -135,20 +135,21 @@ export default function TwoFA() {
                   maxLength={8}
                   disabled={verifyMutation.isPending}
                   data-testid="input-code"
-                  className="text-center text-lg tracking-widest font-mono"
+                  className="text-center text-base md:text-lg tracking-widest font-mono h-12 md:h-14"
+                  autoFocus
                 />
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground">
                   O código foi enviado. Você pode pedir um novo em 17 segundos.
                 </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mt-3">
-                  <p className="font-medium text-blue-900 mb-1">Para demonstração:</p>
-                  <p className="text-blue-800">Digite qualquer código de <span className="font-mono font-semibold">8 dígitos</span></p>
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-xs md:text-sm">
+                  <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">Para demonstração:</p>
+                  <p className="text-blue-800 dark:text-blue-200">Digite qualquer código de <span className="font-mono font-semibold">8 dígitos</span></p>
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full min-h-11 md:min-h-12 text-base font-medium"
                 disabled={verifyMutation.isPending || code.length !== 8}
                 data-testid="button-verify"
               >
