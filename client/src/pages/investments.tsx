@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Logo } from "@/components/logo";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +36,39 @@ export default function Investments() {
     }
   }, [isInitialized, isAuthenticated, setLocation]);
 
+  // Format currency input with Brazilian formatting
+  const formatBRLInput = (value: string) => {
+    // Remove tudo exceto números
+    const numbers = value.replace(/\D/g, '');
+    
+    if (!numbers) return '';
+    
+    // Converte para centavos
+    const cents = parseInt(numbers, 10);
+    
+    // Formata com separadores brasileiros
+    const reais = (cents / 100).toFixed(2);
+    const [intPart, decPart] = reais.split('.');
+    
+    // Adiciona pontos de milhar
+    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    return `${formattedInt},${decPart}`;
+  };
+
+  // Parse Brazilian formatted currency to number
+  const parseBRLInput = (value: string): number => {
+    if (!value) return 0;
+    // Remove pontos e substitui vírgula por ponto
+    const cleaned = value.replace(/\./g, '').replace(',', '.');
+    return parseFloat(cleaned) || 0;
+  };
+
+  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatBRLInput(e.target.value);
+    setInvestmentAmount(formatted);
+  };
+
   const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery({
     queryKey: ['/api/investments/products'],
     enabled: isInitialized && isAuthenticated && !!userId,
@@ -66,7 +98,7 @@ export default function Investments() {
       
       toast({
         title: "Investimento realizado!",
-        description: `${formatCurrency(parseFloat(investmentAmount))} aplicado com sucesso`,
+        description: `${formatCurrency(parseBRLInput(investmentAmount))} aplicado com sucesso`,
       });
       
       setSelectedProduct(null);
@@ -95,7 +127,9 @@ export default function Investments() {
   };
 
   const handleInvest = () => {
-    if (!selectedProduct || !investmentAmount || parseFloat(investmentAmount) <= 0) {
+    const numericAmount = parseBRLInput(investmentAmount);
+    
+    if (!selectedProduct || !investmentAmount || numericAmount <= 0) {
       toast({
         variant: "destructive",
         title: "Campos obrigatórios",
@@ -116,7 +150,7 @@ export default function Investments() {
     const product = products.find((p: any) => p.id === selectedProduct);
     const minimumAmount = safeNumber(product?.minimum);
     
-    if (product && safeNumber(investmentAmount) < minimumAmount) {
+    if (product && numericAmount < minimumAmount) {
       toast({
         variant: "destructive",
         title: "Valor mínimo",
@@ -128,7 +162,7 @@ export default function Investments() {
     investMutation.mutate({
       userId,
       productId: selectedProduct,
-      amount: investmentAmount,
+      amount: numericAmount.toString(),
     });
   };
 
@@ -168,7 +202,6 @@ export default function Investments() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Logo size="sm" />
             <h1 className="font-semibold">Investimentos</h1>
           </div>
           <ThemeToggle />
@@ -278,13 +311,12 @@ export default function Investments() {
                               </span>
                               <Input
                                 id={`amount-${product.id}`}
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
                                 placeholder="0,00"
                                 value={investmentAmount}
-                                onChange={(e) => setInvestmentAmount(e.target.value)}
+                                onChange={handleAmountChange}
                                 className="pl-10"
-                                step="0.01"
-                                min={safeNumber(product.minimum)}
                                 data-testid="input-investment-amount"
                                 onClick={(e) => e.stopPropagation()}
                               />
@@ -294,13 +326,13 @@ export default function Investments() {
                             </p>
                           </div>
 
-                          {investmentAmount && safeNumber(investmentAmount) >= safeNumber(product.minimum) && (
+                          {investmentAmount && parseBRLInput(investmentAmount) >= safeNumber(product.minimum) && (
                             <Card className="bg-muted">
                               <CardContent className="p-4 space-y-2">
                                 <div className="flex items-center justify-between">
                                   <p className="text-sm text-muted-foreground">Rendimento estimado (1 ano)</p>
                                   <p className="font-semibold font-mono tabular-nums text-green-600 dark:text-green-400">
-                                    +{formatCurrency(safeNumber(investmentAmount) * (safeNumber(product.expectedReturn) / 100))}
+                                    +{formatCurrency(parseBRLInput(investmentAmount) * (safeNumber(product.expectedReturn) / 100))}
                                   </p>
                                 </div>
                               </CardContent>
