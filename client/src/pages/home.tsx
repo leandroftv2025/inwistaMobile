@@ -70,11 +70,23 @@ export default function Home() {
     queryKey: ['/api/catalog'],
   });
 
+  interface RateData {
+    rate: string;
+    spread: string;
+    timestamp: string;
+  }
+
+  const { data: rateData } = useQuery<RateData>({
+    queryKey: ['/api/stablecoin/rate'],
+  });
+
   const balance = parseFloat(userData?.balanceBRL || '0');
+  const balanceStable = parseFloat(userData?.balanceStable || '0');
+  const conversionRate = parseFloat(rateData?.rate || '5.25');
   const totalInvested = userInvestments
     .filter(inv => inv.status === 'active')
     .reduce((sum, inv) => sum + parseFloat(inv.amount || '0'), 0);
-  const netWorth = balance + parseFloat(userData?.balanceStable || '0') + totalInvested;
+  const netWorth = (balanceStable * conversionRate) + totalInvested + balance;
 
   const iconMap: Record<string, any> = {
     "pix": { icon: Zap, color: "text-primary", bgColor: "bg-primary/10" },
