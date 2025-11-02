@@ -136,6 +136,14 @@ export default function Home() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => setLocation("/settings")}
+              data-testid="button-settings"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setLocation("/profile")}
               data-testid="button-profile"
               className="rounded-full"
@@ -154,14 +162,6 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" data-testid="button-notifications">
               <Bell className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/settings")}
-              data-testid="button-settings"
-            >
-              <Settings className="h-5 w-5" />
             </Button>
             <ThemeToggle />
           </div>

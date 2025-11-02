@@ -1,4 +1,3 @@
-import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/lib/theme-provider";
 import { useAuth } from "@/lib/auth-context";
@@ -11,12 +10,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, Moon, Sun, Monitor, Globe, Fingerprint, Lock, Shield, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const { logout } = useAuth();
+  const [language, setLanguage] = useState<string>("pt-BR");
 
   const handleLogout = () => {
     logout();
@@ -42,7 +43,6 @@ export default function Settings() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Logo size="sm" />
             <h1 className="font-semibold">Configurações</h1>
           </div>
           <ThemeToggle />
@@ -149,21 +149,31 @@ export default function Settings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-full p-2 bg-muted">
                   <Globe className="h-4 w-4" />
                 </div>
-                <div>
-                  <p className="font-medium">Idioma</p>
-                  <p className="text-sm text-muted-foreground">
-                    Português (Brasil)
-                  </p>
-                </div>
+                <p className="font-medium">Idioma</p>
               </div>
-              <Button variant="ghost" size="sm" data-testid="button-change-language">
-                Alterar
-              </Button>
+              
+              <RadioGroup value={language} onValueChange={setLanguage}>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="pt-BR" className="cursor-pointer">
+                    Português (Brasil)
+                  </Label>
+                  <RadioGroupItem value="pt-BR" id="pt-BR" data-testid="radio-language-pt-br" />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="en-US" className="cursor-pointer">
+                    English (USA)
+                  </Label>
+                  <RadioGroupItem value="en-US" id="en-US" data-testid="radio-language-en-us" />
+                </div>
+              </RadioGroup>
             </div>
           </CardContent>
         </Card>
