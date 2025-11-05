@@ -153,3 +153,10 @@ export const investmentSimulationSchema = z.object({
   productId: z.string(),
   amount: z.string().refine((val) => parseFloat(val) > 0, "Valor deve ser maior que zero"),
 });
+
+export const registrationSchema = z.object({
+  fullName: z.string().min(3, "Nome completo é obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  phone: z.string().min(10, "Telefone inválido"),
+  cpf: z.string().length(14, "CPF deve ter 11 dígitos"),
+});

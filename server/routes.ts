@@ -7,11 +7,45 @@ import {
   sendPixSchema,
   convertStablecoinSchema,
   investmentSimulationSchema,
+  registrationSchema,
 } from "@shared/schema";
 import { readFileSync } from "fs";
 import { join } from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { fullName, email, phone, cpf } = registrationSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByCPF(cpf);
+      if (existingUser) {
+        return res.status(400).json({ message: "CPF já cadastrado" });
+      }
+
+      const user = await storage.createUser({
+        cpf,
+        password: "123456",
+        name: fullName,
+        email,
+        phone,
+      });
+
+      await storage.createPixKey({
+        userId: user.id,
+        keyType: "cpf",
+        keyValue: cpf,
+      });
+
+      res.json({
+        success: true,
+        userId: user.id,
+        message: "Conta criada com sucesso",
+      });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Erro ao criar conta" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { cpf, password } = loginSchema.parse(req.body);
