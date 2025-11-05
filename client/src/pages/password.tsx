@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, Delete, Shield } from "lucide-react";
-import logoPath from "@assets/Logo_1762382781790.PNG";
+import logoPath from "@assets/logo-inwista.png";
 
 export default function Password() {
   const [, setLocation] = useLocation();
@@ -49,13 +49,10 @@ export default function Password() {
     },
   });
 
-  const handleNumberPress = (numbers: string) => {
+  const handleNumberPress = (digit: string) => {
     if (password.length < 6) {
-      setPressedKey(numbers);
+      setPressedKey(digit);
       setTimeout(() => setPressedKey(null), 150);
-      
-      // For demo, we'll use the first number from the options
-      const digit = numbers.charAt(0);
       setPassword(prev => prev + digit);
     }
   };
@@ -86,11 +83,11 @@ export default function Password() {
   }, [password]);
 
   const keypadButtons = [
-    { label: "5 ou 8", value: "58" },
-    { label: "4 ou 0", value: "40" },
-    { label: "6 ou 1", value: "61" },
-    { label: "3 ou 2", value: "32" },
-    { label: "9 ou 7", value: "97" },
+    { label: "5 ou 8", digits: ["5", "8"] },
+    { label: "4 ou 0", digits: ["4", "0"] },
+    { label: "6 ou 1", digits: ["6", "1"] },
+    { label: "3 ou 2", digits: ["3", "2"] },
+    { label: "9 ou 7", digits: ["9", "7"] },
   ];
 
   return (
@@ -134,44 +131,56 @@ export default function Password() {
         <div className="w-full max-w-sm space-y-4">
           {/* First Row */}
           <div className="grid grid-cols-3 gap-4">
-            {keypadButtons.slice(0, 3).map((btn) => (
-              <button
-                key={btn.value}
-                onClick={() => handleNumberPress(btn.value)}
-                className={`aspect-square rounded-full text-base font-normal transition-all ${
-                  pressedKey === btn.value
-                    ? "bg-[#103549] text-white"
-                    : "bg-muted text-foreground hover-elevate active-elevate-2"
-                }`}
-                data-testid={`button-key-${btn.value}`}
-              >
-                {btn.label}
-              </button>
+            {keypadButtons.slice(0, 3).map((btn, idx) => (
+              <div key={idx} className="aspect-square rounded-full bg-muted flex items-center justify-center">
+                <div className="flex items-center gap-1">
+                  {btn.digits.map((digit) => (
+                    <button
+                      key={digit}
+                      onClick={() => handleNumberPress(digit)}
+                      className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
+                        pressedKey === digit
+                          ? "bg-[#103549] text-white"
+                          : "bg-transparent text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
+                      }`}
+                      data-testid={`button-key-${digit}`}
+                    >
+                      {digit}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
 
           {/* Second Row */}
           <div className="grid grid-cols-3 gap-4">
-            {keypadButtons.slice(3).map((btn) => (
-              <button
-                key={btn.value}
-                onClick={() => handleNumberPress(btn.value)}
-                className={`aspect-square rounded-full text-base font-normal transition-all ${
-                  pressedKey === btn.value
-                    ? "bg-[#103549] text-white"
-                    : "bg-muted text-foreground hover-elevate active-elevate-2"
-                }`}
-                data-testid={`button-key-${btn.value}`}
-              >
-                {btn.label}
-              </button>
+            {keypadButtons.slice(3).map((btn, idx) => (
+              <div key={idx} className="aspect-square rounded-full bg-muted flex items-center justify-center">
+                <div className="flex items-center gap-1">
+                  {btn.digits.map((digit) => (
+                    <button
+                      key={digit}
+                      onClick={() => handleNumberPress(digit)}
+                      className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
+                        pressedKey === digit
+                          ? "bg-[#103549] text-white"
+                          : "bg-transparent text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
+                      }`}
+                      data-testid={`button-key-${digit}`}
+                    >
+                      {digit}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
             <button
               onClick={handleBackspace}
               className={`aspect-square rounded-full flex items-center justify-center transition-all ${
                 pressedKey === "backspace"
                   ? "bg-[#103549] text-white"
-                  : "bg-muted text-foreground hover-elevate active-elevate-2"
+                  : "bg-muted text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
               }`}
               data-testid="button-backspace"
             >
