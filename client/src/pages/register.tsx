@@ -18,6 +18,34 @@ interface RegistrationData {
   confirmPassword: string;
 }
 
+const validateCPF = (cpf: string): boolean => {
+  const cleanCPF = cpf.replace(/\D/g, "");
+  
+  if (cleanCPF.length !== 11) return false;
+  
+  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
+  
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
+  }
+  let firstDigit = 11 - (sum % 11);
+  if (firstDigit >= 10) firstDigit = 0;
+  
+  if (parseInt(cleanCPF.charAt(9)) !== firstDigit) return false;
+  
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
+  }
+  let secondDigit = 11 - (sum % 11);
+  if (secondDigit >= 10) secondDigit = 0;
+  
+  if (parseInt(cleanCPF.charAt(10)) !== secondDigit) return false;
+  
+  return true;
+};
+
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -102,13 +130,15 @@ export default function Register() {
       });
       return;
     }
-    if (step === 4 && formData.cpf.replace(/\D/g, "").length !== 11) {
-      toast({
-        title: "CPF inválido",
-        description: "Por favor, informe um CPF válido.",
-        variant: "destructive",
-      });
-      return;
+    if (step === 4) {
+      if (!validateCPF(formData.cpf)) {
+        toast({
+          title: "CPF inválido",
+          description: "Por favor, informe um CPF válido.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     if (step === 5) {
       if (!formData.password || formData.password.length < 6) {
@@ -153,25 +183,29 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-2xl bg-background p-6 sm:p-8 md:p-12">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-12">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              className="rounded-full"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </Button>
-            <img src={logoPath} alt="Logo" className="h-10 sm:h-12" />
-          </div>
+      {/* Header fixo no topo para steps 1-5 */}
+      {step <= 5 && (
+        <header className="flex items-center justify-between p-4 sm:p-6 border-b">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            className="rounded-full"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </Button>
+          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+          <div className="w-10"></div>
+        </header>
+      )}
 
+      {/* Conteúdo principal */}
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-2xl">
           {/* Step 1: Nome completo */}
           {step === 1 && (
-            <div className="space-y-16 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
               <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
                 Qual é o seu nome completo?
               </h1>
@@ -195,14 +229,6 @@ export default function Register() {
                         autoFocus
                       />
                     </div>
-                    <Button
-                      onClick={handleNext}
-                      size="icon"
-                      className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                      data-testid="button-next-step1"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -211,7 +237,7 @@ export default function Register() {
 
           {/* Step 2: E-mail */}
           {step === 2 && (
-            <div className="space-y-16 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
               <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
                 Qual é o seu e-mail?
               </h1>
@@ -233,14 +259,6 @@ export default function Register() {
                       data-testid="input-email"
                       autoFocus
                     />
-                    <Button
-                      onClick={handleNext}
-                      size="icon"
-                      className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                      data-testid="button-next-step2"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -249,7 +267,7 @@ export default function Register() {
 
           {/* Step 3: Telefone */}
           {step === 3 && (
-            <div className="space-y-16 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
               <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
                 Qual é o número do seu celular?
               </h1>
@@ -273,14 +291,6 @@ export default function Register() {
                         autoFocus
                       />
                     </div>
-                    <Button
-                      onClick={handleNext}
-                      size="icon"
-                      className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                      data-testid="button-next-step3"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -289,7 +299,7 @@ export default function Register() {
 
           {/* Step 4: CPF */}
           {step === 4 && (
-            <div className="space-y-16 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
               <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
                 Qual é o seu CPF?
               </h1>
@@ -311,14 +321,6 @@ export default function Register() {
                       maxLength={14}
                       autoFocus
                     />
-                    <Button
-                      onClick={handleNext}
-                      size="icon"
-                      className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                      data-testid="button-next-step4"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -327,7 +329,7 @@ export default function Register() {
 
           {/* Step 5: Senha */}
           {step === 5 && (
-            <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
               <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
                 Crie sua senha de acesso
               </h1>
@@ -396,14 +398,6 @@ export default function Register() {
                         )}
                       </button>
                     </div>
-                    <Button
-                      onClick={handleNext}
-                      size="icon"
-                      className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                      data-testid="button-next-step5"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -413,6 +407,21 @@ export default function Register() {
           {/* Step 6: Confirmação */}
           {step === 6 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+              {/* Header para step 6 */}
+              <div className="flex items-center justify-between mb-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleBack}
+                  className="rounded-full"
+                  data-testid="button-back"
+                >
+                  <ArrowLeft className="h-6 w-6" />
+                </Button>
+                <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+                <div className="w-10"></div>
+              </div>
+
               <div>
                 <h1 className="text-xl sm:text-2xl font-medium text-foreground mb-2">
                   Verifique suas informações
@@ -536,6 +545,20 @@ export default function Register() {
           )}
         </div>
       </div>
+
+      {/* Botão avançar fixo no rodapé direito para steps 1-5 */}
+      {step <= 5 && (
+        <footer className="p-4 sm:p-6 flex justify-end">
+          <Button
+            onClick={handleNext}
+            size="icon"
+            className="rounded-full h-14 w-14 bg-[#103549] hover:bg-[#1a4d68] shadow-lg"
+            data-testid={`button-next-step${step}`}
+          >
+            <ArrowRight className="h-6 w-6" />
+          </Button>
+        </footer>
+      )}
     </div>
   );
 }
