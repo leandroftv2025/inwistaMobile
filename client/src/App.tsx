@@ -9,6 +9,7 @@ import { LanguageProvider } from "@/lib/language-context";
 import Welcome from "@/pages/welcome";
 import Register from "@/pages/register";
 import Login from "@/pages/login";
+import Password from "@/pages/password";
 import TwoFA from "@/pages/two-fa";
 import Home from "@/pages/home";
 import PIX from "@/pages/pix";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/" component={Welcome} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/password" component={Password} />
       <Route path="/two-fa" component={TwoFA} />
       <Route path="/home" component={Home} />
       <Route path="/pix" component={PIX} />
