@@ -182,33 +182,23 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Header fixo no topo para steps 1-5 */}
-      {step <= 5 && (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background flex items-center justify-between p-4 sm:p-6 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
-            className="rounded-full"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
-          <div className="w-10"></div>
-        </header>
-      )}
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header para todas as páginas */}
+      <div className="flex items-center justify-between p-4 sm:p-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBack}
+          className="rounded-full"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+      </div>
 
-      {/* Conteúdo principal com padding para compensar header e footer fixos */}
-      <div 
-        className="flex items-center justify-center p-4 sm:p-6"
-        style={{
-          minHeight: '100vh',
-          paddingTop: step <= 5 ? '5rem' : '1rem',
-          paddingBottom: step <= 5 ? '6rem' : '1rem'
-        }}
-      >
+      {/* Conteúdo principal */}
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-2xl">
           {/* Step 1: Nome completo */}
           {step === 1 && (
@@ -221,8 +211,8 @@ export default function Register() {
                   <Label htmlFor="fullName" className="text-sm text-muted-foreground">
                     Nome e Sobrenome
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="relative flex-1">
+                  <div className="mt-2">
+                    <div className="relative">
                       <Check className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-600" />
                       <Input
                         id="fullName"
@@ -235,6 +225,16 @@ export default function Register() {
                         data-testid="input-fullname"
                         autoFocus
                       />
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        data-testid="button-next-step1"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function Register() {
                   <Label htmlFor="email" className="text-sm text-muted-foreground">
                     E-mail
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="mt-2">
                     <Input
                       id="email"
                       type="email"
@@ -266,6 +266,16 @@ export default function Register() {
                       data-testid="input-email"
                       autoFocus
                     />
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        data-testid="button-next-step2"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -283,20 +293,28 @@ export default function Register() {
                   <Label htmlFor="phone" className="text-sm text-muted-foreground">
                     Número com DDD
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="relative flex-1">
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: formatPhone(e.target.value) })
-                        }
-                        placeholder="(00) 00000-0000"
-                        className="text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary"
-                        data-testid="input-phone"
-                        maxLength={15}
-                        autoFocus
-                      />
+                  <div className="mt-2">
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: formatPhone(e.target.value) })
+                      }
+                      placeholder="(00) 00000-0000"
+                      className="text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary"
+                      data-testid="input-phone"
+                      maxLength={15}
+                      autoFocus
+                    />
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        data-testid="button-next-step3"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -315,7 +333,7 @@ export default function Register() {
                   <Label htmlFor="cpf" className="text-sm text-muted-foreground">
                     CPF
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="mt-2">
                     <Input
                       id="cpf"
                       value={formData.cpf}
@@ -328,6 +346,16 @@ export default function Register() {
                       maxLength={14}
                       autoFocus
                     />
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        data-testid="button-next-step4"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -345,8 +373,8 @@ export default function Register() {
                   <Label htmlFor="password" className="text-sm text-muted-foreground">
                     Criar senha
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="relative flex-1">
+                  <div className="mt-2">
+                    <div className="relative">
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -379,8 +407,8 @@ export default function Register() {
                   <Label htmlFor="confirmPassword" className="text-sm text-muted-foreground">
                     Confirmar senha
                   </Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="relative flex-1">
+                  <div className="mt-2">
+                    <div className="relative">
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
@@ -405,6 +433,16 @@ export default function Register() {
                         )}
                       </button>
                     </div>
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        data-testid="button-next-step5"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -414,21 +452,6 @@ export default function Register() {
           {/* Step 6: Confirmação */}
           {step === 6 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
-              {/* Header para step 6 */}
-              <div className="flex items-center justify-between mb-8">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleBack}
-                  className="rounded-full"
-                  data-testid="button-back"
-                >
-                  <ArrowLeft className="h-6 w-6" />
-                </Button>
-                <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
-                <div className="w-10"></div>
-              </div>
-
               <div>
                 <h1 className="text-xl sm:text-2xl font-medium text-foreground mb-2">
                   Verifique suas informações
@@ -552,20 +575,6 @@ export default function Register() {
           )}
         </div>
       </div>
-
-      {/* Botão avançar fixo no rodapé direito para steps 1-5 */}
-      {step <= 5 && (
-        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background p-4 sm:p-6 flex justify-end border-t">
-          <Button
-            onClick={handleNext}
-            size="icon"
-            className="rounded-full h-14 w-14 bg-[#103549] hover:bg-[#1a4d68] shadow-lg"
-            data-testid={`button-next-step${step}`}
-          >
-            <ArrowRight className="h-6 w-6" />
-          </Button>
-        </footer>
-      )}
     </div>
   );
 }
