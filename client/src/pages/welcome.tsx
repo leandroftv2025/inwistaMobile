@@ -29,7 +29,7 @@ export default function Welcome() {
         <div className="w-full max-w-md space-y-3 md:space-y-4">
           <Button
             className="w-full bg-white hover:bg-white/95 text-primary border-0 text-base md:text-lg font-medium min-h-12 md:min-h-14 rounded-lg"
-            onClick={() => setLocation("/login")}
+            onClick={() => setLocation("/register")}
             data-testid="button-open-account"
           >
             Quero abrir uma conta

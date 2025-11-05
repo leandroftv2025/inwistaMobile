@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { AuthProvider } from "@/lib/auth-context";
 import { LanguageProvider } from "@/lib/language-context";
 import Welcome from "@/pages/welcome";
+import Register from "@/pages/register";
 import Login from "@/pages/login";
 import TwoFA from "@/pages/two-fa";
 import Home from "@/pages/home";
@@ -22,6 +23,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Welcome} />
+      <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="/two-fa" component={TwoFA} />
       <Route path="/home" component={Home} />
