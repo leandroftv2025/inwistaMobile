@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,9 +15,6 @@ import {
   Eye,
   EyeOff,
   Globe,
-  HelpCircle,
-  PiggyBank,
-  Settings,
   TrendingUp,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -58,18 +56,6 @@ export default function Home() {
   const { data: userInvestments = [], isLoading: isLoadingInvestments } = useQuery<Investment[]>({
     queryKey: [`/api/investments/portfolio/${userId}`],
     enabled: !!userId,
-  });
-
-  interface CatalogItem {
-    slug: string;
-    name: string;
-    category: string;
-    short: string;
-    enabled: boolean;
-  }
-
-  const { data: catalogData = [], isLoading: isLoadingCatalog } = useQuery<CatalogItem[]>({
-    queryKey: ['/api/catalog'],
   });
 
   interface RateData {
@@ -204,7 +190,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-6xl space-y-6">
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-6xl space-y-6">
         <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
           <CardContent className="p-6 space-y-4">
             {isLoadingUser ? (
@@ -286,70 +272,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Produtos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {isLoadingCatalog ? (
-              <>
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </>
-            ) : (
-              catalogData
-                .filter((p) => p.slug !== 'support')
-                .map((product) => {
-                  const iconConfig = {
-                    "pix": { icon: pixIconPath, color: "text-primary", bgColor: "bg-primary/10", isImage: true },
-                    "stablecoin": { icon: Coins, color: "text-chart-2", bgColor: "bg-chart-2/10", isImage: false },
-                    "investments": { icon: TrendingUp, color: "text-chart-3", bgColor: "bg-chart-3/10", isImage: false },
-                    "card": { icon: CreditCard, color: "text-muted-foreground", bgColor: "bg-muted", isImage: false },
-                    "fx-remittance": { icon: Globe, color: "text-muted-foreground", bgColor: "bg-muted", isImage: false },
-                  }[product.slug] || { icon: HelpCircle, color: "text-muted-foreground", bgColor: "bg-muted", isImage: false };
-
-                  return (
-                    <Card
-                      key={product.slug}
-                      className={`hover-elevate ${!product.enabled ? "opacity-60" : "active-elevate-2"}`}
-                      data-testid={`card-product-${product.slug}`}
-                    >
-                      <CardContent className="p-6">
-                        <button
-                          onClick={() => product.enabled && setLocation(`/${product.slug}`)}
-                          disabled={!product.enabled}
-                          className="w-full text-left"
-                        >
-                          <div className="flex items-start gap-4">
-                            <div className={`rounded-full p-3 ${iconConfig.bgColor}`}>
-                              {iconConfig.isImage ? (
-                                <img src={iconConfig.icon as string} alt={product.name} className="h-6 w-6" />
-                              ) : (
-                                <iconConfig.icon className={`h-6 w-6 ${iconConfig.color}`} />
-                              )}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-semibold">{product.name}</h3>
-                                {!product.enabled && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Em breve
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {product.short}
-                              </p>
-                            </div>
-                          </div>
-                        </button>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-            )}
-          </div>
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle>{t("home.recentTransactions")}</CardTitle>
@@ -405,17 +327,7 @@ export default function Home() {
         </Card>
       </main>
 
-      <div className="fixed bottom-4 right-4">
-        <Button
-          variant="default"
-          size="icon"
-          className="rounded-full h-14 w-14 shadow-lg"
-          onClick={() => setLocation("/support")}
-          data-testid="button-help"
-        >
-          <HelpCircle className="h-6 w-6" />
-        </Button>
-      </div>
+      <BottomNav />
     </div>
   );
 }
