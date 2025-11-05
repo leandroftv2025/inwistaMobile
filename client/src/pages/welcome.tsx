@@ -12,9 +12,9 @@ export default function Welcome() {
         <Logo className="h-32 md:h-48" />
       </div>
       
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8 pt-24 md:pt-32">
-        <div className="w-full max-w-md space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-center space-y-3">
+      <div className="flex-1 flex flex-col justify-between px-6 pb-8 pt-24 md:pt-32">
+        <div className="w-full max-w-md pt-16 md:pt-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="text-left space-y-3">
             <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white">
               Que bom te ver aqui!
             </h1>
@@ -22,25 +22,25 @@ export default function Welcome() {
               Vamos começar?
             </p>
           </div>
+        </div>
 
-          <div className="space-y-4">
-            <Button
-              className="w-full bg-white hover:bg-white/95 text-primary border-0 text-lg font-medium min-h-14 rounded-lg"
-              onClick={() => setLocation("/login")}
-              data-testid="button-open-account"
-            >
-              Quero abrir uma conta
-            </Button>
+        <div className="w-full max-w-md space-y-4">
+          <Button
+            className="w-full bg-white hover:bg-white/95 text-primary border-0 text-lg font-medium min-h-14 rounded-lg"
+            onClick={() => setLocation("/login")}
+            data-testid="button-open-account"
+          >
+            Quero abrir uma conta
+          </Button>
 
-            <Button
-              variant="outline"
-              className="w-full bg-transparent hover:bg-white/10 text-white border-2 border-white text-lg font-medium min-h-14 rounded-lg"
-              onClick={() => setLocation("/login")}
-              data-testid="button-access-account"
-            >
-              Acessar conta
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            className="w-full bg-transparent hover:bg-white/10 text-white border-2 border-white text-lg font-medium min-h-14 rounded-lg"
+            onClick={() => setLocation("/login")}
+            data-testid="button-access-account"
+          >
+            Acessar conta
+          </Button>
         </div>
       </div>
 
