@@ -310,33 +310,38 @@ export default function Home() {
                   return (
                     <Card
                       key={product.slug}
-                      className={`hover-elevate ${!product.enabled ? "opacity-60" : "cursor-pointer active-elevate-2"}`}
-                      onClick={() => product.enabled && setLocation(`/${product.slug}`)}
+                      className={`hover-elevate ${!product.enabled ? "opacity-60" : "active-elevate-2"}`}
                       data-testid={`card-product-${product.slug}`}
                     >
                       <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          <div className={`rounded-full p-3 ${iconConfig.bgColor}`}>
-                            {iconConfig.isImage ? (
-                              <img src={iconConfig.icon as string} alt={product.name} className="h-6 w-6" />
-                            ) : (
-                              <iconConfig.icon className={`h-6 w-6 ${iconConfig.color}`} />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold">{product.name}</h3>
-                              {!product.enabled && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Em breve
-                                </Badge>
+                        <button
+                          onClick={() => product.enabled && setLocation(`/${product.slug}`)}
+                          disabled={!product.enabled}
+                          className="w-full text-left"
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className={`rounded-full p-3 ${iconConfig.bgColor}`}>
+                              {iconConfig.isImage ? (
+                                <img src={iconConfig.icon as string} alt={product.name} className="h-6 w-6" />
+                              ) : (
+                                <iconConfig.icon className={`h-6 w-6 ${iconConfig.color}`} />
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {product.short}
-                            </p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold">{product.name}</h3>
+                                {!product.enabled && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Em breve
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {product.short}
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        </button>
                       </CardContent>
                     </Card>
                   );
