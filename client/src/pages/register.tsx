@@ -231,8 +231,7 @@ export default function Register() {
                     Número com DDD
                   </Label>
                   <div className="flex items-center gap-2 mt-2">
-                    <div className="relative flex-1 flex items-center gap-2">
-                      <span className="text-2xl">🇧🇷</span>
+                    <div className="relative flex-1">
                       <Input
                         id="phone"
                         value={formData.phone}
