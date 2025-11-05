@@ -12,15 +12,17 @@ export default function Welcome() {
         <Logo className="h-32 md:h-48" />
       </div>
       
-      <div className="flex-1 flex flex-col justify-between px-6 pb-8 pt-24 md:pt-32">
-        <div className="w-full max-w-md pt-16 md:pt-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="text-left space-y-3">
-            <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white">
-              Que bom te ver aqui!
-            </h1>
-            <p className="text-2xl md:text-3xl text-white/90">
-              Vamos começar?
-            </p>
+      <div className="flex-1 flex flex-col px-6 pb-8 pt-24 md:pt-32">
+        <div className="flex-1 flex items-end pb-12">
+          <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-left space-y-3">
+              <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white">
+                Que bom te ver aqui!
+              </h1>
+              <p className="text-2xl md:text-3xl text-white/90">
+                Vamos começar?
+              </p>
+            </div>
           </div>
         </div>
 
