@@ -182,10 +182,10 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background relative">
       {/* Header fixo no topo para steps 1-5 */}
       {step <= 5 && (
-        <header className="flex items-center justify-between p-4 sm:p-6 border-b">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background flex items-center justify-between p-4 sm:p-6 border-b">
           <Button
             variant="ghost"
             size="icon"
@@ -200,8 +200,15 @@ export default function Register() {
         </header>
       )}
 
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
+      {/* Conteúdo principal com padding para compensar header e footer fixos */}
+      <div 
+        className="flex items-center justify-center p-4 sm:p-6"
+        style={{
+          minHeight: '100vh',
+          paddingTop: step <= 5 ? '5rem' : '1rem',
+          paddingBottom: step <= 5 ? '6rem' : '1rem'
+        }}
+      >
         <div className="w-full max-w-2xl">
           {/* Step 1: Nome completo */}
           {step === 1 && (
@@ -548,7 +555,7 @@ export default function Register() {
 
       {/* Botão avançar fixo no rodapé direito para steps 1-5 */}
       {step <= 5 && (
-        <footer className="p-4 sm:p-6 flex justify-end">
+        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background p-4 sm:p-6 flex justify-end border-t">
           <Button
             onClick={handleNext}
             size="icon"
