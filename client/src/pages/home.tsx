@@ -18,7 +18,6 @@ import {
   PiggyBank,
   Settings,
   TrendingUp,
-  Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
@@ -26,6 +25,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { useQuery } from "@tanstack/react-query";
 import type { User, PixTransaction, StablecoinTransaction, Investment } from "@shared/schema";
+import pixIconPath from "@assets/icone PIX_1762379081445.PNG";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -90,25 +90,6 @@ export default function Home() {
     .reduce((sum, inv) => sum + parseFloat(inv.amount || '0'), 0);
   const netWorth = (balanceStable * conversionRate) + totalInvested + balance;
 
-  const iconMap: Record<string, any> = {
-    "pix": { icon: Zap, color: "text-primary", bgColor: "bg-primary/10" },
-    "stablecoin": { icon: Coins, color: "text-chart-2", bgColor: "bg-chart-2/10" },
-    "investments": { icon: TrendingUp, color: "text-chart-3", bgColor: "bg-chart-3/10" },
-    "card": { icon: CreditCard, color: "text-muted-foreground", bgColor: "bg-muted" },
-    "fx-remittance": { icon: Globe, color: "text-muted-foreground", bgColor: "bg-muted" },
-    "support": { icon: HelpCircle, color: "text-muted-foreground", bgColor: "bg-muted" },
-  };
-
-  const products = catalogData
-    .filter((p) => p.slug !== 'support')
-    .map((product) => ({
-      ...product,
-      description: product.short,
-      icon: iconMap[product.slug]?.icon || HelpCircle,
-      color: product.enabled ? iconMap[product.slug]?.color : "text-muted-foreground",
-      bgColor: product.enabled ? iconMap[product.slug]?.bgColor : "bg-muted",
-    }));
-
   const allTransactions = [
     ...pixTransactions.map((tx) => ({
       id: `pix-${tx.id}`,
@@ -129,6 +110,59 @@ export default function Home() {
       positive: tx.type === 'sell',
     })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
+
+  const quickActions = [
+    {
+      slug: 'pix',
+      icon: pixIconPath,
+      name: 'PIX',
+      description: 'Transferências',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      enabled: true,
+      isImage: true,
+    },
+    {
+      slug: 'stablecoin',
+      icon: Coins,
+      name: 'StableCOIN',
+      description: 'BRL ↔ Stable',
+      color: 'text-chart-2',
+      bgColor: 'bg-chart-2/10',
+      enabled: true,
+      isImage: false,
+    },
+    {
+      slug: 'investments',
+      icon: TrendingUp,
+      name: 'Investimentos',
+      description: 'Aplicar',
+      color: 'text-chart-3',
+      bgColor: 'bg-chart-3/10',
+      enabled: true,
+      isImage: false,
+    },
+    {
+      slug: 'card',
+      icon: CreditCard,
+      name: 'Cartão',
+      description: 'Débito e crédito',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted',
+      enabled: false,
+      isImage: false,
+    },
+    {
+      slug: 'fx-remittance',
+      icon: Globe,
+      name: 'Câmbio e Remessas',
+      description: 'Envios internacionais',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted',
+      enabled: false,
+      isImage: false,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -184,7 +218,7 @@ export default function Home() {
                   <div>
                     <p className="text-sm text-muted-foreground">{t("home.balance")}</p>
                     <div className="flex items-center gap-3 mt-1">
-                      <p className="text-3xl font-bold font-mono tabular-nums" data-testid="text-balance-brl">
+                      <p className="text-3xl font-semibold tabular-nums tracking-tight" data-testid="text-balance-brl">
                         {showBalance ? formatCurrency(balance) : "••••••"}
                       </p>
                       <Button
@@ -206,32 +240,51 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div>
                     <p className="text-sm text-muted-foreground">{t("home.netWorth")}</p>
-                    <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-networth">
+                    <p className="text-lg font-semibold tabular-nums tracking-tight" data-testid="text-networth">
                       {showBalance ? formatCurrency(netWorth) : "••••••"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t("home.totalInvested")}</p>
-                    <p className="text-lg font-semibold font-mono tabular-nums" data-testid="text-invested">
+                    <p className="text-lg font-semibold tabular-nums tracking-tight" data-testid="text-invested">
                       {showBalance ? formatCurrency(totalInvested) : "••••••"}
                     </p>
                   </div>
                 </div>
               </>
             )}
-
-            <div className="flex gap-2 pt-2">
-              <Button variant="default" className="flex-1" onClick={() => setLocation("/pix")} data-testid="button-quick-pix">
-                <Zap className="h-4 w-4 mr-2" />
-                {t("pix.title")}
-              </Button>
-              <Button variant="outline" className="flex-1" onClick={() => setLocation("/investments")} data-testid="button-quick-invest">
-                <PiggyBank className="h-4 w-4 mr-2" />
-                {t("home.invest")}
-              </Button>
-            </div>
           </CardContent>
         </Card>
+
+        <div className="overflow-x-auto -mx-4 px-4 pb-2">
+          <div className="flex gap-3 min-w-max">
+            {quickActions.map((action) => (
+              <button
+                key={action.slug}
+                onClick={() => action.enabled && setLocation(`/${action.slug}`)}
+                disabled={!action.enabled}
+                className={`flex-shrink-0 bg-card rounded-2xl p-4 flex flex-col items-center gap-2 min-w-[140px] border transition-all ${
+                  action.enabled 
+                    ? 'hover-elevate active-elevate-2 cursor-pointer' 
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+                data-testid={`button-quick-${action.slug}`}
+              >
+                <div className={`rounded-full p-3 ${action.bgColor}`}>
+                  {action.isImage ? (
+                    <img src={action.icon as string} alt={action.name} className="h-6 w-6" />
+                  ) : (
+                    <action.icon className={`h-6 w-6 ${action.color}`} />
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-sm">{action.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{action.description}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <Card>
           <CardHeader>
@@ -273,7 +326,7 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                  <p className={`font-semibold font-mono tabular-nums ${activity.positive ? "text-green-600 dark:text-green-400" : "text-foreground"}`}>
+                  <p className={`font-semibold tabular-nums tracking-tight ${activity.positive ? "text-green-600 dark:text-green-400" : "text-foreground"}`}>
                     {activity.amount > 0 && "+"}
                     {formatCurrency(activity.amount)}
                   </p>
@@ -286,49 +339,6 @@ export default function Home() {
             </Button>
           </CardContent>
         </Card>
-
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Produtos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {isLoadingCatalog ? (
-              <>
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </>
-            ) : (
-              products.map((product: any) => (
-                <Card
-                  key={product.slug}
-                  className={`hover-elevate ${!product.enabled ? "opacity-60" : "cursor-pointer active-elevate-2"}`}
-                  onClick={() => product.enabled && setLocation(`/${product.slug}`)}
-                  data-testid={`card-product-${product.slug}`}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`rounded-full p-3 ${product.bgColor}`}>
-                        <product.icon className={`h-6 w-6 ${product.color}`} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{product.name}</h3>
-                          {!product.enabled && (
-                            <Badge variant="secondary" className="text-xs">
-                              Em breve
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {product.description}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
       </main>
 
       <div className="fixed bottom-4 right-4">
