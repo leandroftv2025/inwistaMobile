@@ -15,7 +15,7 @@ import { join } from "path";
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { fullName, email, phone, cpf } = registrationSchema.parse(req.body);
+      const { fullName, email, phone, cpf, password } = registrationSchema.parse(req.body);
       
       const existingUser = await storage.getUserByCPF(cpf);
       if (existingUser) {
@@ -24,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser({
         cpf,
-        password: "123456",
+        password,
         name: fullName,
         email,
         phone,

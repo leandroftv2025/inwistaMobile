@@ -159,4 +159,5 @@ export const registrationSchema = z.object({
   email: z.string().email("E-mail inválido"),
   phone: z.string().min(10, "Telefone inválido"),
   cpf: z.string().length(14, "CPF deve ter 11 dígitos"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
