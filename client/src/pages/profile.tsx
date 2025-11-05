@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -55,7 +56,7 @@ export default function Profile() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-4xl space-y-6">
         {/* Avatar and Basic Info */}
         <Card>
           <CardContent className="p-6">
@@ -237,6 +238,7 @@ export default function Profile() {
           </Button>
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -223,7 +224,7 @@ export default function PIX() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-4xl space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="send" data-testid="tab-send">
@@ -471,6 +472,7 @@ export default function PIX() {
           </TabsContent>
         </Tabs>
       </main>
+      <BottomNav />
     </div>
   );
 }

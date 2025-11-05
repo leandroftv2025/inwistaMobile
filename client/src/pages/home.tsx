@@ -15,6 +15,7 @@ import {
   Eye,
   EyeOff,
   Globe,
+  Settings,
   TrendingUp,
 } from "lucide-react";
 import { useState, useEffect } from "react";

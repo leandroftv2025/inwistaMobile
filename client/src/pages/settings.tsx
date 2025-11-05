@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BottomNav } from "@/components/bottom-nav";
 import { useTheme } from "@/lib/theme-provider";
 import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
@@ -49,7 +50,7 @@ export default function Settings() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-2xl space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>{t("settings.account")}</CardTitle>
@@ -255,6 +256,7 @@ export default function Settings() {
           {t("settings.version")} 1.0.0
         </p>
       </main>
+      <BottomNav />
     </div>
   );
 }

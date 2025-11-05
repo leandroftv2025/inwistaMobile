@@ -1,5 +1,6 @@
 import { useState, useEffect, type ChangeEvent } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -156,7 +157,7 @@ export default function StableCOIN() {
             <Skeleton className="h-10 w-10" />
           </div>
         </header>
-        <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+        <main className="container mx-auto px-4 py-6 pb-24 max-w-4xl space-y-6">
           <Card>
             <CardContent className="p-6">
               <Skeleton className="h-32 w-full" />
@@ -186,7 +187,7 @@ export default function StableCOIN() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-4xl space-y-6">
         <Card className="bg-gradient-to-br from-chart-2/10 via-chart-2/5 to-transparent">
           <CardContent className="p-6 space-y-4">
             {isLoadingUser ? (
@@ -412,6 +413,7 @@ export default function StableCOIN() {
           </TabsContent>
         </Tabs>
       </main>
+      <BottomNav />
     </div>
   );
 }
