@@ -24,7 +24,6 @@ import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { useQuery } from "@tanstack/react-query";
 import type { User, PixTransaction, StablecoinTransaction, Investment } from "@shared/schema";
-import pixIconPath from "@assets/pix-icon.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -101,7 +100,7 @@ export default function Home() {
   const quickActions = [
     {
       slug: 'pix',
-      icon: pixIconPath,
+      icon: "/attached_assets/pix-icon.png",
       name: 'PIX',
       description: 'Transferências',
       color: 'text-primary',
