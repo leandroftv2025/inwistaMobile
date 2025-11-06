@@ -175,11 +175,11 @@ export default function Cards() {
                 {cards.map((card, index) => (
                   <div
                     key={card.id}
-                    className="flex-shrink-0 w-[85vw] max-w-[380px] snap-center"
+                    className="flex-shrink-0 snap-center"
                     onClick={() => setCurrentCardIndex(index)}
                   >
                     <div
-                      className="relative aspect-[1.586/1] cursor-pointer bg-black rounded-2xl overflow-hidden"
+                      className="relative w-[500px] h-[500px] cursor-pointer bg-black rounded-2xl overflow-hidden"
                       onClick={() => setShowCardBack(!showCardBack)}
                       data-testid={`card-${index}`}
                     >
@@ -187,7 +187,9 @@ export default function Cards() {
                       <img
                         src={cardFrontPath}
                         alt="Frente do cartão"
-                        className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300 ${
+                        width="500"
+                        height="500"
+                        className={`absolute inset-0 w-[500px] h-[500px] object-fill transition-opacity duration-300 ${
                           showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
                         }`}
                       />
@@ -196,14 +198,16 @@ export default function Cards() {
                       <img
                         src={cardBackPath}
                         alt="Verso do cartão"
-                        className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300 ${
+                        width="500"
+                        height="500"
+                        className={`absolute inset-0 w-[500px] h-[500px] object-fill transition-opacity duration-300 ${
                           showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'
                         }`}
                       />
                       
                       {/* Nome do usuário sobreposto */}
                       {userData && !showCardBack && (
-                        <div className="absolute bottom-[22%] left-[10%] text-white text-[10px] font-medium uppercase tracking-wide z-10">
+                        <div className="absolute bottom-[22%] left-[10%] text-white text-sm font-medium uppercase tracking-wide z-10">
                           {userData.name}
                         </div>
                       )}
