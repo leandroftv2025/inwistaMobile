@@ -205,11 +205,8 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header com logo no canto superior esquerdo */}
+      {/* Header com botão voltar à esquerda e logo no canto superior direito */}
       <header className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
-        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -219,6 +216,9 @@ export default function Register() {
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
+        <div className="flex items-center gap-4">
+          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+        </div>
       </header>
 
       {/* Conteúdo principal em tela cheia */}
