@@ -65,6 +65,16 @@ export default function Register() {
     confirmPassword: "",
   });
 
+  // Verifica se há CPF pré-preenchido vindo do login
+  useEffect(() => {
+    const storedCPF = localStorage.getItem("inwista-register-cpf");
+    if (storedCPF) {
+      setFormData(prev => ({ ...prev, cpf: storedCPF }));
+      setStep(4); // Pula para o step do CPF
+      localStorage.removeItem("inwista-register-cpf");
+    }
+  }, []);
+
   const createAccountMutation = useMutation({
     mutationFn: async (data: Omit<RegistrationData, "confirmPassword">) => {
       const response = await apiRequest("/api/auth/register", {

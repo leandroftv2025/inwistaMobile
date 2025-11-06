@@ -58,8 +58,35 @@ export default function Login() {
       return;
     }
 
-    localStorage.setItem("inwista-cpf", cpf);
-    setLocation("/password");
+    // Verifica se o CPF está cadastrado
+    try {
+      const response = await fetch(`/api/auth/user-by-cpf/${cpf}`);
+      
+      if (response.status === 404) {
+        // CPF válido mas não cadastrado - redireciona para cadastro
+        toast({
+          title: "CPF não cadastrado",
+          description: "Vamos criar sua conta!",
+        });
+        localStorage.setItem("inwista-register-cpf", cpf);
+        setLocation("/register");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Erro ao verificar CPF");
+      }
+
+      // CPF cadastrado - continua para senha
+      localStorage.setItem("inwista-cpf", cpf);
+      setLocation("/password");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível verificar o CPF. Tente novamente.",
+      });
+    }
   };
 
   return (
