@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowRight, Delete, Shield } from "lucide-react";
+import { Delete, Shield } from "lucide-react";
 import logoPath from "@assets/logo-inwista.png";
 
 function generateRandomKeypadPairs() {
@@ -28,9 +28,8 @@ function generateRandomKeypadPairs() {
 export default function Password() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [password, setPassword] = useState("");
+  const [selectedSequence, setSelectedSequence] = useState<string[][]>([]);
   const [cpf, setCpf] = useState("");
-  const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [pressedButton, setPressedButton] = useState<number | null>(null);
   
   const keypadButtons = useMemo(() => generateRandomKeypadPairs(), []);
@@ -49,16 +48,16 @@ export default function Password() {
     enabled: !!cpf,
   });
 
-  const loginMutation = useMutation({
-    mutationFn: async (data: { cpf: string; password: string }) => {
-      const response = await apiRequest("/api/auth/login", {
+  const validateSequenceMutation = useMutation({
+    mutationFn: async (data: { cpf: string; sequence: string[][] }) => {
+      const response = await apiRequest("/api/auth/validate-keypad-sequence", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Erro ao fazer login");
+        throw new Error(error.message || "Sequência inválida");
       }
       return response.json();
     },
@@ -72,46 +71,30 @@ export default function Password() {
         title: "Senha incorreta",
         description: error.message,
       });
-      setPassword("");
+      setSelectedSequence([]);
     },
   });
 
-  const handleNumberPress = (digit: string, buttonIndex: number) => {
-    if (password.length < 6) {
-      setPressedKey(digit);
-      setPressedButton(buttonIndex);
-      setTimeout(() => {
-        setPressedKey(null);
-        setPressedButton(null);
-      }, 150);
-      setPassword(prev => prev + digit);
-    }
+  const handleBallPress = (pair: string[], buttonIndex: number) => {
+    if (selectedSequence.length >= 6 || !cpf) return;
+
+    setPressedButton(buttonIndex);
+    setTimeout(() => {
+      setPressedButton(null);
+    }, 150);
+
+    setSelectedSequence(prev => [...prev, pair]);
   };
 
   const handleBackspace = () => {
-    setPressedKey("backspace");
-    setTimeout(() => setPressedKey(null), 150);
-    setPassword(prev => prev.slice(0, -1));
-  };
-
-  const handleSubmit = () => {
-    if (password.length !== 6) {
-      toast({
-        variant: "destructive",
-        title: "Senha incompleta",
-        description: "Digite todos os 6 dígitos da senha",
-      });
-      return;
-    }
-
-    loginMutation.mutate({ cpf, password });
+    setSelectedSequence(prev => prev.slice(0, -1));
   };
 
   useEffect(() => {
-    if (password.length === 6) {
-      handleSubmit();
+    if (selectedSequence.length === 6) {
+      validateSequenceMutation.mutate({ cpf, sequence: selectedSequence });
     }
-  }, [password]);
+  }, [selectedSequence]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -141,7 +124,7 @@ export default function Password() {
             <div
               key={i}
               className={`w-3 h-3 rounded-full transition-colors ${
-                i < password.length ? "bg-foreground" : "bg-muted"
+                i < selectedSequence.length ? "bg-foreground" : "bg-muted"
               }`}
               data-testid={`password-dot-${i}`}
             />
@@ -155,42 +138,34 @@ export default function Password() {
           {/* First Row */}
           <div className="grid grid-cols-3 gap-4">
             {keypadButtons.slice(0, 3).map((btn, idx) => (
-              <div 
-                key={idx} 
-                className={`relative aspect-square rounded-full flex flex-col items-center justify-center p-2 transition-all ${
+              <button
+                key={idx}
+                onClick={() => handleBallPress(btn.digits, idx)}
+                className={`aspect-square rounded-full flex items-center justify-center p-2 transition-all cursor-pointer ${
                   pressedButton === idx
                     ? "bg-[#103549]"
                     : "bg-muted"
                 }`}
+                data-testid={`button-ball-${idx}`}
               >
-                <div className="flex items-center justify-center gap-1 w-full h-full">
-                  <button
-                    onClick={() => handleNumberPress(btn.digits[0], idx)}
-                    className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
-                      pressedButton === idx
-                        ? "text-white"
-                        : "text-foreground"
-                    }`}
-                    data-testid={`button-key-${btn.digits[0]}`}
-                  >
+                <div className="flex items-center justify-center gap-1">
+                  <span className={`text-lg font-medium ${
+                    pressedButton === idx ? "text-white" : "text-foreground"
+                  }`}>
                     {btn.digits[0]}
-                  </button>
-                  <span className={`text-xs ${pressedButton === idx ? "text-white" : "text-muted-foreground"}`}>
+                  </span>
+                  <span className={`text-xs ${
+                    pressedButton === idx ? "text-white" : "text-muted-foreground"
+                  }`}>
                     ou
                   </span>
-                  <button
-                    onClick={() => handleNumberPress(btn.digits[1], idx)}
-                    className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
-                      pressedButton === idx
-                        ? "text-white"
-                        : "text-foreground"
-                    }`}
-                    data-testid={`button-key-${btn.digits[1]}`}
-                  >
+                  <span className={`text-lg font-medium ${
+                    pressedButton === idx ? "text-white" : "text-foreground"
+                  }`}>
                     {btn.digits[1]}
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -199,66 +174,42 @@ export default function Password() {
             {keypadButtons.slice(3).map((btn, idx) => {
               const buttonIndex = idx + 3;
               return (
-                <div 
-                  key={idx} 
-                  className={`relative aspect-square rounded-full flex flex-col items-center justify-center p-2 transition-all ${
+                <button
+                  key={idx}
+                  onClick={() => handleBallPress(btn.digits, buttonIndex)}
+                  className={`aspect-square rounded-full flex items-center justify-center p-2 transition-all cursor-pointer ${
                     pressedButton === buttonIndex
                       ? "bg-[#103549]"
                       : "bg-muted"
                   }`}
+                  data-testid={`button-ball-${buttonIndex}`}
                 >
-                  <div className="flex items-center justify-center gap-1 w-full h-full">
-                    <button
-                      onClick={() => handleNumberPress(btn.digits[0], buttonIndex)}
-                      className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
-                        pressedButton === buttonIndex
-                          ? "text-white"
-                          : "text-foreground"
-                      }`}
-                      data-testid={`button-key-${btn.digits[0]}`}
-                    >
+                  <div className="flex items-center justify-center gap-1">
+                    <span className={`text-lg font-medium ${
+                      pressedButton === buttonIndex ? "text-white" : "text-foreground"
+                    }`}>
                       {btn.digits[0]}
-                    </button>
-                    <span className={`text-xs ${pressedButton === buttonIndex ? "text-white" : "text-muted-foreground"}`}>
+                    </span>
+                    <span className={`text-xs ${
+                      pressedButton === buttonIndex ? "text-white" : "text-muted-foreground"
+                    }`}>
                       ou
                     </span>
-                    <button
-                      onClick={() => handleNumberPress(btn.digits[1], buttonIndex)}
-                      className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
-                        pressedButton === buttonIndex
-                          ? "text-white"
-                          : "text-foreground"
-                      }`}
-                      data-testid={`button-key-${btn.digits[1]}`}
-                    >
+                    <span className={`text-lg font-medium ${
+                      pressedButton === buttonIndex ? "text-white" : "text-foreground"
+                    }`}>
                       {btn.digits[1]}
-                    </button>
+                    </span>
                   </div>
-                </div>
+                </button>
               );
             })}
             <button
               onClick={handleBackspace}
-              className={`aspect-square rounded-full flex items-center justify-center transition-all ${
-                pressedKey === "backspace"
-                  ? "bg-[#103549] text-white"
-                  : "bg-muted text-foreground"
-              }`}
+              className="aspect-square rounded-full flex items-center justify-center transition-all bg-muted text-foreground hover-elevate active-elevate-2"
               data-testid="button-backspace"
             >
               <Delete className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-center pt-4">
-            <button
-              onClick={handleSubmit}
-              disabled={password.length !== 6 || loginMutation.isPending}
-              className="w-24 h-24 rounded-full bg-[#0a1f2e] text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#103549] transition-colors"
-              data-testid="button-submit"
-            >
-              <ArrowRight className="w-8 h-8" />
             </button>
           </div>
         </div>

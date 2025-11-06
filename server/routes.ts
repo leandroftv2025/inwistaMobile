@@ -120,6 +120,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/validate-keypad-sequence", async (req, res) => {
+    try {
+      const { cpf, sequence } = req.body;
+
+      if (!cpf || !Array.isArray(sequence) || sequence.length !== 6) {
+        return res.status(400).json({ message: "Dados inválidos" });
+      }
+
+      for (const pair of sequence) {
+        if (!Array.isArray(pair) || pair.length !== 2) {
+          return res.status(400).json({ message: "Sequência inválida" });
+        }
+      }
+
+      const user = await storage.getUserByCPF(cpf);
+      if (!user || user.password.length !== 6) {
+        return res.status(401).json({ message: "CPF ou sequência inválidos" });
+      }
+
+      const pin = user.password;
+      
+      for (let i = 0; i < 6; i++) {
+        const expectedDigit = pin[i];
+        const selectedPair = sequence[i];
+        
+        if (!selectedPair.includes(expectedDigit)) {
+          return res.status(401).json({ message: "Sequência inválida" });
+        }
+      }
+
+      res.json({
+        userId: user.id,
+        name: user.name,
+        requiresTwoFA: true,
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Erro ao validar sequência" });
+    }
+  });
+
   app.get("/api/pix/keys/:userId", async (req, res) => {
     try {
       const keys = await storage.getPixKeys(req.params.userId);
