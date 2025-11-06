@@ -107,6 +107,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/auth/user-by-cpf/:cpf", async (req, res) => {
+    try {
+      const user = await storage.getUserByCPF(req.params.cpf);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      res.json({ name: user.name });
+    } catch (error: any) {
+      res.status(500).json({ message: "Erro ao buscar dados do usuário" });
+    }
+  });
+
   app.get("/api/pix/keys/:userId", async (req, res) => {
     try {
       const keys = await storage.getPixKeys(req.params.userId);

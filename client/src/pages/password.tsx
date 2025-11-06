@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, Delete, Shield } from "lucide-react";
 import logoPath from "@assets/logo-inwista.png";
@@ -12,6 +12,7 @@ export default function Password() {
   const [password, setPassword] = useState("");
   const [cpf, setCpf] = useState("");
   const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const [pressedButton, setPressedButton] = useState<number | null>(null);
 
   useEffect(() => {
     const storedCpf = localStorage.getItem("inwista-cpf");
@@ -21,6 +22,11 @@ export default function Password() {
     }
     setCpf(storedCpf);
   }, [setLocation]);
+
+  const { data: userData } = useQuery<{ name: string }>({
+    queryKey: [`/api/auth/user-by-cpf/${cpf}`],
+    enabled: !!cpf,
+  });
 
   const loginMutation = useMutation({
     mutationFn: async (data: { cpf: string; password: string }) => {
@@ -49,10 +55,14 @@ export default function Password() {
     },
   });
 
-  const handleNumberPress = (digit: string) => {
+  const handleNumberPress = (digit: string, buttonIndex: number) => {
     if (password.length < 6) {
       setPressedKey(digit);
-      setTimeout(() => setPressedKey(null), 150);
+      setPressedButton(buttonIndex);
+      setTimeout(() => {
+        setPressedKey(null);
+        setPressedButton(null);
+      }, 150);
       setPassword(prev => prev + digit);
     }
   };
@@ -98,7 +108,7 @@ export default function Password() {
           <img src={logoPath} alt="Logo" className="w-full h-full object-contain" />
         </div>
         <div className="text-center flex-1">
-          <p className="text-sm text-muted-foreground">ana···ine@gmail.com</p>
+          <p className="text-sm text-muted-foreground">{userData?.name || "Carregando..."}</p>
           <button
             className="text-xs text-primary hover:underline"
             onClick={() => setLocation("/login")}
@@ -132,16 +142,23 @@ export default function Password() {
           {/* First Row */}
           <div className="grid grid-cols-3 gap-4">
             {keypadButtons.slice(0, 3).map((btn, idx) => (
-              <div key={idx} className="aspect-square rounded-full bg-muted flex items-center justify-center">
+              <div 
+                key={idx} 
+                className={`aspect-square rounded-full flex items-center justify-center transition-all ${
+                  pressedButton === idx
+                    ? "bg-[#103549]"
+                    : "bg-muted"
+                }`}
+              >
                 <div className="flex items-center gap-1">
                   {btn.digits.map((digit) => (
                     <button
                       key={digit}
-                      onClick={() => handleNumberPress(digit)}
+                      onClick={() => handleNumberPress(digit, idx)}
                       className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
-                        pressedKey === digit
-                          ? "bg-[#103549] text-white"
-                          : "bg-transparent text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
+                        pressedButton === idx
+                          ? "text-white"
+                          : "text-foreground"
                       }`}
                       data-testid={`button-key-${digit}`}
                     >
@@ -155,26 +172,36 @@ export default function Password() {
 
           {/* Second Row */}
           <div className="grid grid-cols-3 gap-4">
-            {keypadButtons.slice(3).map((btn, idx) => (
-              <div key={idx} className="aspect-square rounded-full bg-muted flex items-center justify-center">
-                <div className="flex items-center gap-1">
-                  {btn.digits.map((digit) => (
-                    <button
-                      key={digit}
-                      onClick={() => handleNumberPress(digit)}
-                      className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
-                        pressedKey === digit
-                          ? "bg-[#103549] text-white"
-                          : "bg-transparent text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
-                      }`}
-                      data-testid={`button-key-${digit}`}
-                    >
-                      {digit}
-                    </button>
-                  ))}
+            {keypadButtons.slice(3).map((btn, idx) => {
+              const buttonIndex = idx + 3;
+              return (
+                <div 
+                  key={idx} 
+                  className={`aspect-square rounded-full flex items-center justify-center transition-all ${
+                    pressedButton === buttonIndex
+                      ? "bg-[#103549]"
+                      : "bg-muted"
+                  }`}
+                >
+                  <div className="flex items-center gap-1">
+                    {btn.digits.map((digit) => (
+                      <button
+                        key={digit}
+                        onClick={() => handleNumberPress(digit, buttonIndex)}
+                        className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
+                          pressedButton === buttonIndex
+                            ? "text-white"
+                            : "text-foreground"
+                        }`}
+                        data-testid={`button-key-${digit}`}
+                      >
+                        {digit}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <button
               onClick={handleBackspace}
               className={`aspect-square rounded-full flex items-center justify-center transition-all ${
@@ -232,10 +259,6 @@ export default function Password() {
         </button>
       </footer>
 
-      {/* Version */}
-      <div className="text-center pb-4">
-        <p className="text-xs text-muted-foreground">Versão 7.5.0 (2356)</p>
-      </div>
     </div>
   );
 }
