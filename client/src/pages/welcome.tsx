@@ -1,7 +1,7 @@
-import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import { useLocation } from "wouter";
+import logoWelcome from '/attached_assets/logo-welcome.png?url';
 
 export default function Welcome() {
   const [, setLocation] = useLocation();
@@ -9,7 +9,7 @@ export default function Welcome() {
   return (
     <div className="min-h-screen bg-primary flex flex-col relative">
       <div className="absolute top-4 left-4 md:top-8 md:left-8 z-10">
-        <Logo className="h-32 md:h-48" />
+        <img src={logoWelcome} alt="Inwista" className="h-32 md:h-48" />
       </div>
       
       <div className="flex-1 flex flex-col px-6 pb-8 pt-20 md:pt-32">
