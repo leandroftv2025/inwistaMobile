@@ -144,18 +144,18 @@ export default function Password() {
             {keypadButtons.slice(0, 3).map((btn, idx) => (
               <div 
                 key={idx} 
-                className={`aspect-square rounded-full flex items-center justify-center transition-all ${
+                className={`relative aspect-square rounded-full flex items-center justify-center p-2 transition-all ${
                   pressedButton === idx
                     ? "bg-[#103549]"
                     : "bg-muted"
                 }`}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center gap-2 w-full h-full">
                   {btn.digits.map((digit) => (
                     <button
                       key={digit}
                       onClick={() => handleNumberPress(digit, idx)}
-                      className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
+                      className={`min-h-11 min-w-11 rounded-full text-base font-medium transition-colors flex items-center justify-center ${
                         pressedButton === idx
                           ? "text-white"
                           : "text-foreground"
@@ -177,18 +177,18 @@ export default function Password() {
               return (
                 <div 
                   key={idx} 
-                  className={`aspect-square rounded-full flex items-center justify-center transition-all ${
+                  className={`relative aspect-square rounded-full flex items-center justify-center p-2 transition-all ${
                     pressedButton === buttonIndex
                       ? "bg-[#103549]"
                       : "bg-muted"
                   }`}
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-center gap-2 w-full h-full">
                     {btn.digits.map((digit) => (
                       <button
                         key={digit}
                         onClick={() => handleNumberPress(digit, buttonIndex)}
-                        className={`w-12 h-12 rounded-full text-base font-normal transition-all ${
+                        className={`min-h-11 min-w-11 rounded-full text-base font-medium transition-colors flex items-center justify-center ${
                           pressedButton === buttonIndex
                             ? "text-white"
                             : "text-foreground"
@@ -207,7 +207,7 @@ export default function Password() {
               className={`aspect-square rounded-full flex items-center justify-center transition-all ${
                 pressedKey === "backspace"
                   ? "bg-[#103549] text-white"
-                  : "bg-muted text-foreground hover:bg-[#103549] hover:text-white active:scale-95"
+                  : "bg-muted text-foreground"
               }`}
               data-testid="button-backspace"
             >
