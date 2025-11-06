@@ -452,11 +452,6 @@ export default function Register() {
                           const value = e.target.value.replace(/\D/g, "");
                           if (value.length <= 6) {
                             setFormData({ ...formData, confirmPassword: value });
-                            if (value.length === 6 && formData.password.length === 6 && formData.password === value) {
-                              setTimeout(() => {
-                                handleNext();
-                              }, 100);
-                            }
                           }
                         }}
                         placeholder="••••••"
@@ -476,6 +471,23 @@ export default function Register() {
                           <Eye className="h-5 w-5" />
                         )}
                       </button>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={handleNext}
+                        size="icon"
+                        disabled={
+                          !formData.password ||
+                          !formData.confirmPassword ||
+                          formData.password.length !== 6 ||
+                          formData.confirmPassword.length !== 6 ||
+                          formData.password !== formData.confirmPassword
+                        }
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68] disabled:opacity-50"
+                        data-testid="button-next-step5"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
