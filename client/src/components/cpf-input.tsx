@@ -18,7 +18,8 @@ export const CPFInput = forwardRef<HTMLInputElement, CPFInputProps>(
       <Input
         {...props}
         ref={ref}
-        type="text"
+        type="tel"
+        inputMode="numeric"
         value={value}
         onChange={handleChange}
         maxLength={14}

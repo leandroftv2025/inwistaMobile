@@ -8,6 +8,9 @@ import logoPath from "@assets/logo-inwista.png";
 function validateCPF(cpf: string): boolean {
   const cleanCPF = cpf.replace(/\D/g, "");
   
+  // CPF de demonstração - exceção à regra
+  if (cleanCPF === "12345678900") return true;
+  
   if (cleanCPF.length !== 11) return false;
   
   if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
