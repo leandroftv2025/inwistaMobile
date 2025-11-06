@@ -1,4 +1,4 @@
-import { Home, CreditCard, ArrowLeftRight, ArrowDownToLine, DollarSign } from "lucide-react";
+import { Home, CreditCard, ArrowLeftRight, ArrowDownToLine, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 
 export function BottomNav() {
@@ -21,14 +21,14 @@ export function BottomNav() {
       path: "/stablecoin",
     },
     {
-      label: "Câmbio",
-      icon: DollarSign,
-      path: "/cambio",
-    },
-    {
       label: "Trazer",
       icon: ArrowDownToLine,
       path: "/pix",
+    },
+    {
+      label: "IWI Assistant",
+      icon: Sparkles,
+      path: "/support",
     },
   ];
 
