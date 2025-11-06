@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth-context";
+import logoPath from "@assets/logo-inwista.png";
 
 export default function TwoFA() {
   const [, setLocation] = useLocation();
@@ -87,18 +88,25 @@ export default function TwoFA() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-6">
-      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Card>
-          <CardHeader className="space-y-3 px-4 py-6 md:px-6 md:py-8">
-            <div className="space-y-2">
-              <CardTitle className="text-lg md:text-xl leading-tight">Vamos ativar o token no seu novo dispositivo</CardTitle>
-              <CardDescription className="text-sm md:text-base">
-                É só continuar para receber um código de validação por e-mail e SMS.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 pb-6 md:px-6 md:pb-8">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header com logo no canto superior direito */}
+      <header className="p-4 flex items-center justify-end">
+        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+      </header>
+
+      {/* Conteúdo principal em tela cheia */}
+      <main className="flex-1 flex flex-col justify-center px-6 pb-12">
+        <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card>
+            <CardHeader className="space-y-3 px-4 py-6 md:px-6 md:py-8">
+              <div className="space-y-2">
+                <CardTitle className="text-lg md:text-xl leading-tight">Vamos ativar o token no seu novo dispositivo</CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                  É só continuar para receber um código de validação por e-mail e SMS.
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 px-4 pb-6 md:px-6 md:pb-8">
             <Button
               variant="default"
               className="w-full min-h-11 md:min-h-12 text-base font-medium"
@@ -134,7 +142,8 @@ export default function TwoFA() {
                 </div>
                 <Input
                   id="code"
-                  type="text"
+                  type="tel"
+                  inputMode="numeric"
                   value={code}
                   onChange={handleCodeChange}
                   placeholder="Digite o código"
@@ -164,7 +173,8 @@ export default function TwoFA() {
             </form>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
