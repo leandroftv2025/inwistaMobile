@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,7 @@ export default function Register() {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<RegistrationData>({
     fullName: "",
     email: "",
@@ -141,10 +142,18 @@ export default function Register() {
       }
     }
     if (step === 5) {
-      if (!formData.password || formData.password.length < 6) {
+      if (!formData.password || formData.password.length !== 6) {
         toast({
-          title: "Senha muito curta",
-          description: "A senha deve ter no mínimo 6 caracteres.",
+          title: "Senha inválida",
+          description: "A senha deve ter exatamente 6 dígitos numéricos.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!/^\d{6}$/.test(formData.password)) {
+        toast({
+          title: "Senha inválida",
+          description: "A senha deve conter apenas números.",
           variant: "destructive",
         });
         return;
@@ -365,24 +374,40 @@ export default function Register() {
           {/* Step 5: Senha */}
           {step === 5 && (
             <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
-              <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
-                Crie sua senha de acesso
-              </h1>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-medium text-foreground">
+                  Crie sua senha de acesso
+                </h1>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Apenas 6 dígitos numéricos
+                </p>
+              </div>
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="password" className="text-sm text-muted-foreground">
-                    Criar senha
+                    Criar senha (6 dígitos)
                   </Label>
                   <div className="mt-2">
                     <div className="relative">
                       <Input
                         id="password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? "tel" : "password"}
+                        inputMode="numeric"
+                        pattern="\d*"
                         value={formData.password}
-                        onChange={(e) =>
-                          setFormData({ ...formData, password: e.target.value })
-                        }
-                        placeholder="Mínimo 6 caracteres"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value.length <= 6) {
+                            setFormData({ ...formData, password: value });
+                            if (value.length === 6) {
+                              setTimeout(() => {
+                                confirmPasswordRef.current?.focus();
+                              }, 100);
+                            }
+                          }
+                        }}
+                        placeholder="••••••"
+                        maxLength={6}
                         className="text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary pr-10"
                         data-testid="input-password"
                         autoFocus
@@ -405,18 +430,30 @@ export default function Register() {
 
                 <div>
                   <Label htmlFor="confirmPassword" className="text-sm text-muted-foreground">
-                    Confirmar senha
+                    Confirmar senha (6 dígitos)
                   </Label>
                   <div className="mt-2">
                     <div className="relative">
                       <Input
+                        ref={confirmPasswordRef}
                         id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showConfirmPassword ? "tel" : "password"}
+                        inputMode="numeric"
+                        pattern="\d*"
                         value={formData.confirmPassword}
-                        onChange={(e) =>
-                          setFormData({ ...formData, confirmPassword: e.target.value })
-                        }
-                        placeholder="Digite a senha novamente"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value.length <= 6) {
+                            setFormData({ ...formData, confirmPassword: value });
+                            if (value.length === 6 && formData.password.length === 6) {
+                              setTimeout(() => {
+                                handleNext();
+                              }, 100);
+                            }
+                          }
+                        }}
+                        placeholder="••••••"
+                        maxLength={6}
                         className="text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary pr-10"
                         data-testid="input-confirm-password"
                       />
@@ -432,16 +469,6 @@ export default function Register() {
                           <Eye className="h-5 w-5" />
                         )}
                       </button>
-                    </div>
-                    <div className="flex justify-end mt-4">
-                      <Button
-                        onClick={handleNext}
-                        size="icon"
-                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
-                        data-testid="button-next-step5"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </Button>
                     </div>
                   </div>
                 </div>
