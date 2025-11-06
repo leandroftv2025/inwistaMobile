@@ -195,23 +195,25 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header para todas as páginas */}
-      <div className="flex items-center justify-between p-4 sm:p-6">
+      {/* Header com logo no canto superior esquerdo */}
+      <header className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+        </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={handleBack}
-          className="rounded-full"
+          className="w-12 h-12 flex items-center justify-center text-foreground hover:text-primary transition-colors"
           data-testid="button-back"
         >
-          <ArrowLeft className="h-6 w-6" />
+          <ArrowLeft className="w-6 h-6" />
         </Button>
-        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
-      </div>
+      </header>
 
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-2xl">
+      {/* Conteúdo principal em tela cheia */}
+      <main className="flex-1 flex flex-col justify-center px-6 pb-12">
+        <div className="w-full max-w-md mx-auto">
           {/* Step 1: Nome completo */}
           {step === 1 && (
             <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -620,7 +622,7 @@ export default function Register() {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
