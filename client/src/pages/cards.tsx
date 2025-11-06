@@ -179,7 +179,7 @@ export default function Cards() {
                     onClick={() => setCurrentCardIndex(index)}
                   >
                     <div
-                      className="relative aspect-[1.586/1] cursor-pointer bg-muted rounded-2xl overflow-hidden"
+                      className="relative aspect-[1.586/1] cursor-pointer rounded-2xl overflow-hidden"
                       onClick={() => setShowCardBack(!showCardBack)}
                       data-testid={`card-${index}`}
                     >
@@ -187,7 +187,7 @@ export default function Cards() {
                       <img
                         src={cardFrontPath}
                         alt="Frente do cartão"
-                        className={`absolute inset-0 left-1/2 top-1/2 w-full h-full max-w-full max-h-full -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-300 ${
+                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                           showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
                         }`}
                       />
@@ -196,7 +196,7 @@ export default function Cards() {
                       <img
                         src={cardBackPath}
                         alt="Verso do cartão"
-                        className={`absolute inset-0 left-1/2 top-1/2 w-full h-full max-w-full max-h-full -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-300 ${
+                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                           showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'
                         }`}
                       />
