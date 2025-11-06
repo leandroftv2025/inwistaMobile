@@ -1,3 +1,5 @@
+import logoInwista from '/attached_assets/logo-inwista.png?url';
+
 interface LogoProps {
   className?: string;
   size?: "sm" | "md" | "lg";
@@ -12,7 +14,7 @@ export function Logo({ className = "", size = "md" }: LogoProps) {
 
   return (
     <img
-      src="/attached_assets/logo-inwista.png"
+      src={logoInwista}
       alt="Inwista"
       className={`${sizeClasses[size]} ${className}`}
       data-testid="img-logo"

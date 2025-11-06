@@ -27,6 +27,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User, PixKey, PixTransaction } from "@shared/schema";
+import qrCodePixImg from '/attached_assets/qrcode-pix_1762052957607.jpg?url';
 
 export default function PIX() {
   const [, setLocation] = useLocation();
@@ -231,12 +232,12 @@ export default function PIX() {
     if (pixKeys.length === 0) return;
 
     const link = document.createElement('a');
-    link.href = "/attached_assets/qrcode-pix_1762052957607.jpg";
+    link.href = qrCodePixImg;
     link.download = 'qrcode-pix.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "QR Code baixado!",
       description: "O QR Code foi salvo com sucesso",
@@ -406,7 +407,7 @@ export default function PIX() {
                     <Skeleton className="w-64 h-64" />
                   ) : pixKeys.length > 0 ? (
                     <img
-                      src="/attached_assets/qrcode-pix_1762052957607.jpg"
+                      src={qrCodePixImg}
                       alt="QR Code PIX"
                       className="w-64 h-64 border rounded-md"
                       data-testid="img-qr-code"
