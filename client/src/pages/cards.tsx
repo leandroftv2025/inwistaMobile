@@ -168,55 +168,52 @@ export default function Cards() {
 
       <main className="flex-1 pb-20 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-          {/* Card Carousel */}
-          <div className="relative">
-            <div className="overflow-x-auto pb-4 -mx-4 px-4">
-              <div className="flex gap-4 snap-x snap-mandatory">
-                {cards.map((card, index) => (
+          {/* Card Carousel - Centralizado */}
+          <div className="relative flex justify-center">
+            <div className="w-full max-w-[380px]">
+              {cards.map((card, index) => (
+                <div
+                  key={card.id}
+                  className={currentCardIndex === index ? "block" : "hidden"}
+                  onClick={() => setCurrentCardIndex(index)}
+                >
                   <div
-                    key={card.id}
-                    className="flex-shrink-0 w-[85vw] max-w-[380px] snap-center"
-                    onClick={() => setCurrentCardIndex(index)}
+                    className="relative aspect-[1.586/1] cursor-pointer bg-black rounded-2xl overflow-hidden"
+                    onClick={() => setShowCardBack(!showCardBack)}
+                    data-testid={`card-${index}`}
                   >
-                    <div
-                      className="relative aspect-[1.586/1] cursor-pointer bg-black rounded-2xl overflow-hidden"
-                      onClick={() => setShowCardBack(!showCardBack)}
-                      data-testid={`card-${index}`}
-                    >
-                      {/* Front Card Image */}
-                      <img
-                        src={cardFrontPath}
-                        alt="Frente do cartão"
-                        className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                          showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
-                        }`}
-                      />
-                      
-                      {/* Back Card Image */}
-                      <img
-                        src={cardBackPath}
-                        alt="Verso do cartão"
-                        className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                          showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'
-                        }`}
-                      />
-                      
-                      {/* Nome do usuário sobreposto */}
-                      {userData && !showCardBack && (
-                        <div className="absolute bottom-[18%] left-[8%] text-white text-xs font-medium uppercase tracking-wider z-10">
-                          {userData.name}
-                        </div>
-                      )}
-                    </div>
+                    {/* Front Card Image */}
+                    <img
+                      src={cardFrontPath}
+                      alt="Frente do cartão"
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                        showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
+                      }`}
+                    />
+                    
+                    {/* Back Card Image */}
+                    <img
+                      src={cardBackPath}
+                      alt="Verso do cartão"
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                        showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'
+                      }`}
+                    />
+                    
+                    {/* Nome do usuário sobreposto */}
+                    {userData && !showCardBack && (
+                      <div className="absolute bottom-[12%] left-[6%] text-gray-400 text-[11px] font-medium uppercase tracking-wide z-10">
+                        {userData.name}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-            
           </div>
 
-          {/* Fatura Aberta */}
-          <div className="bg-card border rounded-lg p-4 space-y-3">
+          {/* Fatura Aberta - Centralizado */}
+          <div className="max-w-[380px] mx-auto bg-card border rounded-lg p-4 space-y-3">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Fatura aberta</p>
@@ -240,8 +237,8 @@ export default function Cards() {
             </div>
           </div>
 
-          {/* Limite Disponível */}
-          <div className="bg-card border rounded-lg p-4">
+          {/* Limite Disponível - Centralizado */}
+          <div className="max-w-[380px] mx-auto bg-card border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Limite disponível</p>
@@ -251,8 +248,8 @@ export default function Cards() {
             </div>
           </div>
 
-          {/* Milhas e Benefícios */}
-          <div className="bg-card border rounded-lg p-4">
+          {/* Milhas e Benefícios - Centralizado */}
+          <div className="max-w-[380px] mx-auto bg-card border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium">Milhas e Benefícios</p>
@@ -269,17 +266,19 @@ export default function Cards() {
             </div>
           </div>
 
-          {/* Antecipar Pagamento */}
-          <Button
-            variant="outline"
-            className="w-full h-12 text-base"
-            data-testid="button-advance-payment"
-          >
+          {/* Antecipar Pagamento - Centralizado */}
+          <div className="max-w-[380px] mx-auto">
+            <Button
+              variant="outline"
+              className="w-full h-12 text-base"
+              data-testid="button-advance-payment"
+            >
             Antecipar pagamento
-          </Button>
+            </Button>
+          </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-4 gap-4">
+          {/* Quick Actions - Centralizado */}
+          <div className="max-w-[380px] mx-auto grid grid-cols-4 gap-4">
             <button
               className="flex flex-col items-center gap-2 p-3 rounded-lg hover-elevate active-elevate-2"
               data-testid="button-card-management"
