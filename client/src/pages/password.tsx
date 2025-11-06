@@ -134,32 +134,32 @@ export default function Password() {
         <h2 className="text-xl font-normal mb-16 text-center">Digite sua senha.</h2>
 
         {/* Numeric Keypad */}
-        <div className="w-full max-w-sm space-y-4">
+        <div className="w-full max-w-sm space-y-6">
           {/* First Row */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-6 justify-items-center">
             {keypadButtons.slice(0, 3).map((btn, idx) => (
               <button
                 key={idx}
                 onClick={() => handleBallPress(btn.digits, idx)}
-                className={`aspect-square rounded-full flex items-center justify-center p-2 transition-all cursor-pointer ${
+                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                   pressedButton === idx
                     ? "bg-[#103549]"
                     : "bg-muted"
                 }`}
                 data-testid={`button-ball-${idx}`}
               >
-                <div className="flex items-center justify-center gap-1">
-                  <span className={`text-lg font-medium ${
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className={`text-xl font-medium ${
                     pressedButton === idx ? "text-white" : "text-foreground"
                   }`}>
                     {btn.digits[0]}
                   </span>
-                  <span className={`text-xs ${
-                    pressedButton === idx ? "text-white" : "text-muted-foreground"
+                  <span className={`text-sm font-normal ${
+                    pressedButton === idx ? "text-white/80" : "text-muted-foreground"
                   }`}>
                     ou
                   </span>
-                  <span className={`text-lg font-medium ${
+                  <span className={`text-xl font-medium ${
                     pressedButton === idx ? "text-white" : "text-foreground"
                   }`}>
                     {btn.digits[1]}
@@ -170,32 +170,32 @@ export default function Password() {
           </div>
 
           {/* Second Row */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-6 justify-items-center">
             {keypadButtons.slice(3).map((btn, idx) => {
               const buttonIndex = idx + 3;
               return (
                 <button
                   key={idx}
                   onClick={() => handleBallPress(btn.digits, buttonIndex)}
-                  className={`aspect-square rounded-full flex items-center justify-center p-2 transition-all cursor-pointer ${
+                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                     pressedButton === buttonIndex
                       ? "bg-[#103549]"
                       : "bg-muted"
                   }`}
                   data-testid={`button-ball-${buttonIndex}`}
                 >
-                  <div className="flex items-center justify-center gap-1">
-                    <span className={`text-lg font-medium ${
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className={`text-xl font-medium ${
                       pressedButton === buttonIndex ? "text-white" : "text-foreground"
                     }`}>
                       {btn.digits[0]}
                     </span>
-                    <span className={`text-xs ${
-                      pressedButton === buttonIndex ? "text-white" : "text-muted-foreground"
+                    <span className={`text-sm font-normal ${
+                      pressedButton === buttonIndex ? "text-white/80" : "text-muted-foreground"
                     }`}>
                       ou
                     </span>
-                    <span className={`text-lg font-medium ${
+                    <span className={`text-xl font-medium ${
                       pressedButton === buttonIndex ? "text-white" : "text-foreground"
                     }`}>
                       {btn.digits[1]}
@@ -206,7 +206,7 @@ export default function Password() {
             })}
             <button
               onClick={handleBackspace}
-              className="aspect-square rounded-full flex items-center justify-center transition-all bg-muted text-foreground hover-elevate active-elevate-2"
+              className="w-20 h-20 rounded-full flex items-center justify-center transition-all bg-muted text-foreground hover-elevate active-elevate-2"
               data-testid="button-backspace"
             >
               <Delete className="w-6 h-6" />
