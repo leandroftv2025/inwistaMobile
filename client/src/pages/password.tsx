@@ -134,14 +134,14 @@ export default function Password() {
         <h2 className="text-xl font-normal mb-16 text-center">Digite sua senha.</h2>
 
         {/* Numeric Keypad */}
-        <div className="w-full max-w-sm space-y-6">
+        <div className="w-full max-w-sm space-y-4">
           {/* First Row */}
-          <div className="grid grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-3 gap-4 justify-items-center">
             {keypadButtons.slice(0, 3).map((btn, idx) => (
               <button
                 key={idx}
                 onClick={() => handleBallPress(btn.digits, idx)}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                className={`w-24 h-24 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                   pressedButton === idx
                     ? "bg-[#103549]"
                     : "bg-muted"
@@ -149,17 +149,17 @@ export default function Password() {
                 data-testid={`button-ball-${idx}`}
               >
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className={`text-xl font-medium ${
+                  <span className={`text-2xl font-medium ${
                     pressedButton === idx ? "text-white" : "text-foreground"
                   }`}>
                     {btn.digits[0]}
                   </span>
-                  <span className={`text-sm font-normal ${
-                    pressedButton === idx ? "text-white/80" : "text-muted-foreground"
+                  <span className={`text-base font-semibold ${
+                    pressedButton === idx ? "text-white/90" : "text-muted-foreground"
                   }`}>
                     ou
                   </span>
-                  <span className={`text-xl font-medium ${
+                  <span className={`text-2xl font-medium ${
                     pressedButton === idx ? "text-white" : "text-foreground"
                   }`}>
                     {btn.digits[1]}
@@ -170,14 +170,14 @@ export default function Password() {
           </div>
 
           {/* Second Row */}
-          <div className="grid grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-3 gap-4 justify-items-center">
             {keypadButtons.slice(3).map((btn, idx) => {
               const buttonIndex = idx + 3;
               return (
                 <button
                   key={idx}
                   onClick={() => handleBallPress(btn.digits, buttonIndex)}
-                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                     pressedButton === buttonIndex
                       ? "bg-[#103549]"
                       : "bg-muted"
@@ -185,17 +185,17 @@ export default function Password() {
                   data-testid={`button-ball-${buttonIndex}`}
                 >
                   <div className="flex items-center justify-center gap-1.5">
-                    <span className={`text-xl font-medium ${
+                    <span className={`text-2xl font-medium ${
                       pressedButton === buttonIndex ? "text-white" : "text-foreground"
                     }`}>
                       {btn.digits[0]}
                     </span>
-                    <span className={`text-sm font-normal ${
-                      pressedButton === buttonIndex ? "text-white/80" : "text-muted-foreground"
+                    <span className={`text-base font-semibold ${
+                      pressedButton === buttonIndex ? "text-white/90" : "text-muted-foreground"
                     }`}>
                       ou
                     </span>
-                    <span className={`text-xl font-medium ${
+                    <span className={`text-2xl font-medium ${
                       pressedButton === buttonIndex ? "text-white" : "text-foreground"
                     }`}>
                       {btn.digits[1]}
@@ -206,7 +206,7 @@ export default function Password() {
             })}
             <button
               onClick={handleBackspace}
-              className="w-20 h-20 rounded-full flex items-center justify-center transition-all bg-muted text-foreground hover-elevate active-elevate-2"
+              className="w-24 h-24 rounded-full flex items-center justify-center transition-all bg-muted text-foreground hover-elevate active-elevate-2"
               data-testid="button-backspace"
             >
               <Delete className="w-6 h-6" />
