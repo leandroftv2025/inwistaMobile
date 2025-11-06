@@ -371,10 +371,24 @@ curl http://localhost:5000/api/health
 curl http://localhost:5000/api/ready
 ```
 
+**Aviso de segurança HTTPS ("Sua conexão não é particular")**:
+```bash
+# 1. No servidor, exporte o certificado CA
+sudo bash deploy/scripts/export_ssl_ca.sh
+
+# 2. Em cada dispositivo, acesse pelo navegador:
+# http://192.168.1.15/ssl-ca
+
+# 3. Baixe e instale o certificado conforme instruções
+```
+
+📖 **Guia completo de SSL**: Veja [SSL-SETUP.md](./SSL-SETUP.md) para instruções detalhadas por plataforma.
+
 ---
 
 ## 📚 Documentação Adicional
 
+- [SSL-SETUP.md](./SSL-SETUP.md) - **Configuração de certificados SSL/HTTPS**
 - [SECURITY.md](./SECURITY.md) - Política de segurança
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Guia completo de troubleshooting
 - [deploy/README.md](./deploy/README.md) - Guia de deploy
