@@ -14,6 +14,7 @@ import TwoFA from "@/pages/two-fa";
 import Home from "@/pages/home";
 import PIX from "@/pages/pix";
 import StableCOIN from "@/pages/stablecoin";
+import Cambio from "@/pages/cambio";
 import Investments from "@/pages/investments";
 import Cards from "@/pages/cards";
 import Settings from "@/pages/settings";
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/home" component={Home} />
       <Route path="/pix" component={PIX} />
       <Route path="/stablecoin" component={StableCOIN} />
+      <Route path="/cambio" component={Cambio} />
       <Route path="/investments" component={Investments} />
       <Route path="/card" component={Cards} />
       <Route path="/settings" component={Settings} />
