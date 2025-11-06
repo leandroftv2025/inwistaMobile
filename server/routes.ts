@@ -8,6 +8,7 @@ import {
   convertStablecoinSchema,
   investmentSimulationSchema,
   registrationSchema,
+  validatePasswordSchema,
 } from "@shared/schema";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -157,6 +158,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ message: "Erro ao validar sequência" });
+    }
+  });
+
+  app.post("/api/auth/validate-password", async (req, res) => {
+    try {
+      const { userId, password } = validatePasswordSchema.parse(req.body);
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      if (user.password !== password) {
+        return res.status(401).json({ message: "Senha inválida" });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Erro ao validar senha" });
     }
   });
 

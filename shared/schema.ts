@@ -161,3 +161,8 @@ export const registrationSchema = z.object({
   cpf: z.string().length(14, "CPF deve ter 11 dígitos"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
+
+export const validatePasswordSchema = z.object({
+  userId: z.string(),
+  password: z.string().min(1, "Senha é obrigatória"),
+});

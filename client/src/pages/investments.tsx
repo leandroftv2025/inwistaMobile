@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PasswordAuthorization } from "@/components/password-authorization";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, TrendingUp, Shield, Clock, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
@@ -25,6 +26,8 @@ export default function Investments() {
   const [activeTab, setActiveTab] = useState("products");
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState("");
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [pendingTransaction, setPendingTransaction] = useState<any>(null);
 
   const safeNumber = (value: any): number => {
     const n = Number(value);
@@ -160,11 +163,44 @@ export default function Investments() {
       return;
     }
 
-    investMutation.mutate({
+    setPendingTransaction({
       userId,
       productId: selectedProduct,
       amount: numericAmount.toString(),
     });
+    setShowPasswordDialog(true);
+  };
+
+  const handlePasswordAuthorization = async (password: string) => {
+    if (!userId || !pendingTransaction) return;
+
+    try {
+      const validateResponse = await apiRequest("/api/auth/validate-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!validateResponse.ok) {
+        const error = await validateResponse.json();
+        toast({
+          variant: "destructive",
+          title: "Senha inválida",
+          description: error.message || "A senha informada está incorreta",
+        });
+        return;
+      }
+
+      setShowPasswordDialog(false);
+      investMutation.mutate(pendingTransaction);
+      setPendingTransaction(null);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao validar senha",
+        description: "Tente novamente",
+      });
+    }
   };
 
   if (!isInitialized) {
@@ -453,6 +489,13 @@ export default function Investments() {
         </Tabs>
       </main>
       <BottomNav />
+      <PasswordAuthorization
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        onAuthorize={handlePasswordAuthorization}
+        title="Autorizar investimento"
+        description="Digite sua senha para confirmar este investimento"
+      />
     </div>
   );
 }

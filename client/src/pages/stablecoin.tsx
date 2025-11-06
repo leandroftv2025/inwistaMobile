@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PasswordAuthorization } from "@/components/password-authorization";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { ArrowLeft, ArrowDownUp, TrendingUp, TrendingDown } from "lucide-react";
 import { useLocation } from "wouter";
@@ -25,6 +26,8 @@ export default function StableCOIN() {
   const [activeTab, setActiveTab] = useState("trade");
   const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [pendingTransaction, setPendingTransaction] = useState<any>(null);
 
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
@@ -138,11 +141,44 @@ export default function StableCOIN() {
       return;
     }
 
-    convertMutation.mutate({
+    setPendingTransaction({
       userId,
       type: tradeType,
       amount: numericAmount.toString(),
     });
+    setShowPasswordDialog(true);
+  };
+
+  const handlePasswordAuthorization = async (password: string) => {
+    if (!userId || !pendingTransaction) return;
+
+    try {
+      const validateResponse = await apiRequest("/api/auth/validate-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!validateResponse.ok) {
+        const error = await validateResponse.json();
+        toast({
+          variant: "destructive",
+          title: "Senha inválida",
+          description: error.message || "A senha informada está incorreta",
+        });
+        return;
+      }
+
+      setShowPasswordDialog(false);
+      convertMutation.mutate(pendingTransaction);
+      setPendingTransaction(null);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao validar senha",
+        description: "Tente novamente",
+      });
+    }
   };
 
   if (!isInitialized) {
@@ -414,6 +450,13 @@ export default function StableCOIN() {
         </Tabs>
       </main>
       <BottomNav />
+      <PasswordAuthorization
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        onAuthorize={handlePasswordAuthorization}
+        title="Autorizar conversão"
+        description={`Digite sua senha para confirmar a ${tradeType === "buy" ? "compra" : "venda"} de StableCOIN`}
+      />
     </div>
   );
 }

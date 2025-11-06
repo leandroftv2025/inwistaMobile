@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { getUserId } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { BottomNav } from "@/components/bottom-nav";
+import { PasswordAuthorization } from "@/components/password-authorization";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Info, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,11 +19,13 @@ interface User {
 
 export default function Cambio() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const userId = getUserId();
   const [isSending, setIsSending] = useState(true); // true = enviar, false = receber
   const [sendToMyAccount, setSendToMyAccount] = useState(true);
   const [amount, setAmount] = useState("1000.00");
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
 
   const { data: userData } = useQuery<User>({
     queryKey: ["/api/user", userId],
@@ -53,6 +58,64 @@ export default function Cambio() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9,]/g, "");
     setAmount(value);
+  };
+
+  const handleContinue = () => {
+    const numericAmount = parseFloat(amount.replace(",", ".")) || 0;
+    
+    if (numericAmount <= 0) {
+      toast({
+        variant: "destructive",
+        title: "Valor inválido",
+        description: "Digite um valor válido para a transação",
+      });
+      return;
+    }
+
+    if (!userId) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Usuário não autenticado",
+      });
+      return;
+    }
+
+    setShowPasswordDialog(true);
+  };
+
+  const handlePasswordAuthorization = async (password: string) => {
+    if (!userId) return;
+
+    try {
+      const validateResponse = await apiRequest("/api/auth/validate-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!validateResponse.ok) {
+        const error = await validateResponse.json();
+        toast({
+          variant: "destructive",
+          title: "Senha inválida",
+          description: error.message || "A senha informada está incorreta",
+        });
+        return;
+      }
+
+      setShowPasswordDialog(false);
+      toast({
+        title: "Transação autorizada!",
+        description: `${isSending ? "Envio" : "Recebimento"} de câmbio confirmado`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao validar senha",
+        description: "Tente novamente",
+      });
+    }
   };
 
   return (
@@ -204,6 +267,7 @@ export default function Cambio() {
           {/* Botão Continuar */}
           <Button
             className="w-full h-12 text-base"
+            onClick={handleContinue}
             data-testid="button-continue"
           >
             Continuar
@@ -213,6 +277,13 @@ export default function Cambio() {
       </main>
 
       <BottomNav />
+      <PasswordAuthorization
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        onAuthorize={handlePasswordAuthorization}
+        title="Autorizar transação de câmbio"
+        description={`Digite sua senha para confirmar o ${isSending ? "envio" : "recebimento"} internacional`}
+      />
     </div>
   );
 }

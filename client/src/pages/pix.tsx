@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PasswordAuthorization } from "@/components/password-authorization";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -35,6 +36,8 @@ export default function PIX() {
   const userId = user?.id;
   const [activeTab, setActiveTab] = useState("send");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [pendingTransaction, setPendingTransaction] = useState<any>(null);
   
   const [recipientKey, setRecipientKey] = useState("");
   const [amount, setAmount] = useState("");
@@ -171,12 +174,48 @@ export default function PIX() {
       }
     }
 
-    sendPixMutation.mutate({
+    // Armazena transação pendente e abre diálogo de senha
+    setPendingTransaction({
       userId: userId!,
       recipientKey,
       amount: numericAmount.toString(),
       description: description || undefined,
     });
+    setShowPasswordDialog(true);
+  };
+
+  const handlePasswordAuthorization = async (password: string) => {
+    if (!userId || !pendingTransaction) return;
+
+    try {
+      // Valida senha
+      const validateResponse = await apiRequest("/api/auth/validate-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!validateResponse.ok) {
+        const error = await validateResponse.json();
+        toast({
+          variant: "destructive",
+          title: "Senha inválida",
+          description: error.message || "A senha informada está incorreta",
+        });
+        return;
+      }
+
+      // Se a senha estiver correta, executa a transação
+      setShowPasswordDialog(false);
+      sendPixMutation.mutate(pendingTransaction);
+      setPendingTransaction(null);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao validar senha",
+        description: "Tente novamente",
+      });
+    }
   };
 
   const copyKey = (key: string) => {
@@ -473,6 +512,13 @@ export default function PIX() {
         </Tabs>
       </main>
       <BottomNav />
+      <PasswordAuthorization
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        onAuthorize={handlePasswordAuthorization}
+        title="Autorizar transferência PIX"
+        description="Digite sua senha para confirmar esta transferência"
+      />
     </div>
   );
 }

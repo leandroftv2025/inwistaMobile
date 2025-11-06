@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { getUserId } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { BottomNav } from "@/components/bottom-nav";
+import { PasswordAuthorization } from "@/components/password-authorization";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Settings, CreditCard, Lock, TrendingUp, ChevronRight, HelpCircle, Eye, EyeOff, Copy, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +31,8 @@ export default function Cards() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [cardLocked, setCardLocked] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"lock" | "unlock" | null>(null);
 
   const { data: userData, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ["/api/user", userId],
@@ -121,6 +125,52 @@ export default function Cards() {
   ];
 
   const currentCard = cards[currentCardIndex];
+
+  const handlePasswordAuthorization = async (password: string) => {
+    if (!userId) return;
+
+    try {
+      const validateResponse = await apiRequest("/api/auth/validate-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      if (!validateResponse.ok) {
+        const error = await validateResponse.json();
+        toast({
+          variant: "destructive",
+          title: "Senha inválida",
+          description: error.message || "A senha informada está incorreta",
+        });
+        return;
+      }
+
+      setShowPasswordDialog(false);
+      
+      if (pendingAction === "lock") {
+        setCardLocked(true);
+        toast({
+          title: "Cartão bloqueado",
+          description: "Seu cartão foi bloqueado temporariamente",
+        });
+      } else if (pendingAction === "unlock") {
+        setCardLocked(false);
+        toast({
+          title: "Cartão desbloqueado",
+          description: "Seu cartão foi desbloqueado e pode ser usado normalmente",
+        });
+      }
+      
+      setPendingAction(null);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao validar senha",
+        description: "Tente novamente",
+      });
+    }
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -429,13 +479,8 @@ export default function Cards() {
                   variant={cardLocked ? "default" : "destructive"}
                   size="sm"
                   onClick={() => {
-                    setCardLocked(!cardLocked);
-                    toast({
-                      title: cardLocked ? "Cartão desbloqueado" : "Cartão bloqueado",
-                      description: cardLocked 
-                        ? "Seu cartão foi desbloqueado e pode ser usado normalmente" 
-                        : "Seu cartão foi bloqueado temporariamente",
-                    });
+                    setPendingAction(cardLocked ? "unlock" : "lock");
+                    setShowPasswordDialog(true);
                   }}
                   data-testid="button-toggle-lock"
                 >
@@ -557,6 +602,13 @@ export default function Cards() {
           </div>
         </SheetContent>
       </Sheet>
+      <PasswordAuthorization
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        onAuthorize={handlePasswordAuthorization}
+        title={`Autorizar ${pendingAction === "lock" ? "bloqueio" : "desbloqueio"}`}
+        description={`Digite sua senha para ${pendingAction === "lock" ? "bloquear" : "desbloquear"} seu cartão`}
+      />
     </div>
   );
 }
