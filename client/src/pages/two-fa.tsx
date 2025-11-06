@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
@@ -96,20 +95,20 @@ export default function TwoFA() {
 
       {/* Conteúdo principal em tela cheia */}
       <main className="flex-1 flex flex-col justify-center px-6 pb-12">
-        <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <Card>
-            <CardHeader className="space-y-3 px-4 py-6 md:px-6 md:py-8">
-              <div className="space-y-2">
-                <CardTitle className="text-lg md:text-xl leading-tight">Vamos ativar o token no seu novo dispositivo</CardTitle>
-                <CardDescription className="text-sm md:text-base">
-                  É só continuar para receber um código de validação por e-mail e SMS.
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 px-4 pb-6 md:px-6 md:pb-8">
+        <div className="w-full max-w-md mx-auto space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-2xl font-normal text-left">
+              Vamos ativar o token no seu novo dispositivo
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              É só continuar para receber um código de validação por e-mail e SMS.
+            </p>
+          </div>
+
+          <div className="space-y-6">
             <Button
               variant="default"
-              className="w-full min-h-11 md:min-h-12 text-base font-medium"
+              className="w-full min-h-12 text-base font-medium bg-[#103549] hover:bg-[#1a4d68]"
               onClick={() => {
                 toast({
                   title: "Código enviado!",
@@ -121,21 +120,23 @@ export default function TwoFA() {
               Continuar
             </Button>
 
-            <div className="relative my-5 md:my-6">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
+                <span className="bg-background px-2 text-muted-foreground">
                   Ou digite o código
                 </span>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-3">
-                <Label htmlFor="code" className="text-sm md:text-base leading-snug">É só digitar o código de 8 dígitos que enviamos por SMS e e-mail</Label>
-                <div className="text-xs md:text-sm text-muted-foreground">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <Label htmlFor="code" className="text-base">
+                  É só digitar o código de 8 dígitos que enviamos por SMS e e-mail
+                </Label>
+                <div className="text-sm text-muted-foreground">
                   <a href="#" className="text-primary hover:underline">
                     Conferir e-mail ou celular cadastrado
                   </a>
@@ -150,13 +151,13 @@ export default function TwoFA() {
                   maxLength={8}
                   disabled={verifyMutation.isPending}
                   data-testid="input-code"
-                  className="text-center text-base md:text-lg tracking-widest font-mono h-12 md:h-14"
+                  className="text-center text-lg tracking-widest font-mono h-14"
                   autoFocus
                 />
                 <p className="text-xs text-muted-foreground">
                   O código foi enviado. Você pode pedir um novo em 17 segundos.
                 </p>
-                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-xs md:text-sm">
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
                   <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">Para demonstração:</p>
                   <p className="text-blue-800 dark:text-blue-200">Digite qualquer código de <span className="font-mono font-semibold">8 dígitos</span></p>
                 </div>
@@ -164,15 +165,14 @@ export default function TwoFA() {
 
               <Button
                 type="submit"
-                className="w-full min-h-11 md:min-h-12 text-base font-medium"
+                className="w-full min-h-12 text-base font-medium bg-[#103549] hover:bg-[#1a4d68]"
                 disabled={verifyMutation.isPending || code.length !== 8}
                 data-testid="button-verify"
               >
                 {verifyMutation.isPending ? "Verificando..." : "Verificar código"}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
         </div>
       </main>
     </div>
