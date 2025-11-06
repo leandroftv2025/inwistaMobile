@@ -4,10 +4,22 @@ import { getUserId } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
 import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Settings, CreditCard, Lock, TrendingUp, ChevronRight, HelpCircle } from "lucide-react";
+import { ArrowLeft, Settings, CreditCard, Lock, TrendingUp, ChevronRight, HelpCircle, Eye, EyeOff, Copy, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import cardFrontPath from "@assets/card-front.png";
 import cardBackPath from "@assets/card-back.png";
+
+interface User {
+  name: string;
+  [key: string]: unknown;
+}
 
 export default function Cards() {
   const [, setLocation] = useLocation();
@@ -15,8 +27,10 @@ export default function Cards() {
   const { toast } = useToast();
   const [showCardBack, setShowCardBack] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
+  const [cardLocked, setCardLocked] = useState(false);
 
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
+  const { data: userData, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ["/api/user", userId],
     enabled: !!userId,
   });
@@ -137,7 +151,12 @@ export default function Cards() {
           </Button>
           <h1 className="text-lg font-medium">Cartões</h1>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" data-testid="button-sort">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setShowSettings(true)}
+              data-testid="button-settings"
+            >
               <Settings className="w-5 h-5" />
             </Button>
             <Button variant="ghost" size="icon" data-testid="button-help">
@@ -165,25 +184,27 @@ export default function Cards() {
                       data-testid={`card-${index}`}
                     >
                       {!showCardBack ? (
-                        <div className="relative w-full h-full">
+                        <div className="relative w-full h-full flex items-center justify-center">
                           <img
                             src={cardFrontPath}
                             alt="Frente do cartão"
-                            className="w-full h-full object-contain"
+                            className="w-full h-full object-cover rounded-2xl"
                           />
                           {/* Nome do usuário sobreposto */}
-                          {userData && typeof userData === 'object' && 'name' in userData && (
+                          {userData && (
                             <div className="absolute bottom-[18%] left-[8%] text-white text-xs font-medium uppercase tracking-wider">
                               {userData.name}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <img
-                          src={cardBackPath}
-                          alt="Verso do cartão"
-                          className="w-full h-full object-contain"
-                        />
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <img
+                            src={cardBackPath}
+                            alt="Verso do cartão"
+                            className="w-full h-full object-cover rounded-2xl"
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -364,6 +385,172 @@ export default function Cards() {
       </main>
 
       <BottomNav />
+
+      {/* Settings Sheet */}
+      <Sheet open={showSettings} onOpenChange={setShowSettings}>
+        <SheetContent side="bottom" className="h-[80vh]">
+          <SheetHeader>
+            <SheetTitle>Configurações do Cartão</SheetTitle>
+            <SheetDescription>
+              Gerencie as configurações e segurança do seu cartão
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-6 space-y-4">
+            {/* Bloquear/Desbloquear Cartão */}
+            <div className="bg-card border rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {cardLocked ? (
+                    <div className="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-red-600" />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-green-600" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium text-sm">
+                      {cardLocked ? "Cartão bloqueado" : "Cartão desbloqueado"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {cardLocked ? "Nenhuma compra será autorizada" : "Compras autorizadas normalmente"}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant={cardLocked ? "default" : "destructive"}
+                  size="sm"
+                  onClick={() => {
+                    setCardLocked(!cardLocked);
+                    toast({
+                      title: cardLocked ? "Cartão desbloqueado" : "Cartão bloqueado",
+                      description: cardLocked 
+                        ? "Seu cartão foi desbloqueado e pode ser usado normalmente" 
+                        : "Seu cartão foi bloqueado temporariamente",
+                    });
+                  }}
+                  data-testid="button-toggle-lock"
+                >
+                  {cardLocked ? "Desbloquear" : "Bloquear"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Ver Senha */}
+            <button
+              className="w-full bg-card border rounded-lg p-4 flex items-center justify-between hover-elevate active-elevate-2"
+              onClick={() => {
+                toast({
+                  title: "Senha do cartão",
+                  description: "Por segurança, verifique sua identidade no app",
+                });
+              }}
+              data-testid="button-view-password"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Ver senha</p>
+                  <p className="text-xs text-muted-foreground">Consulte a senha do seu cartão</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            {/* Copiar Número do Cartão */}
+            <button
+              className="w-full bg-card border rounded-lg p-4 flex items-center justify-between hover-elevate active-elevate-2"
+              onClick={() => {
+                toast({
+                  title: "Número copiado",
+                  description: "Número do cartão copiado para área de transferência",
+                });
+              }}
+              data-testid="button-copy-number"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Copy className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Copiar número do cartão</p>
+                  <p className="text-xs text-muted-foreground">Final {currentCard.lastDigits}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            {/* Alterar Limite */}
+            <button
+              className="w-full bg-card border rounded-lg p-4 flex items-center justify-between hover-elevate active-elevate-2"
+              onClick={() => {
+                toast({
+                  title: "Alterar limite",
+                  description: "Você pode solicitar aumento ou redução do limite",
+                });
+              }}
+              data-testid="button-change-limit"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Alterar limite</p>
+                  <p className="text-xs text-muted-foreground">Limite atual: R$ 500.000,00</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            {/* Cancelar Cartão */}
+            <button
+              className="w-full bg-card border rounded-lg p-4 flex items-center justify-between hover-elevate active-elevate-2"
+              onClick={() => {
+                toast({
+                  title: "Cancelar cartão",
+                  description: "Esta ação não pode ser desfeita. Confirme com nossa central",
+                  variant: "destructive",
+                });
+              }}
+              data-testid="button-cancel-card"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center">
+                  <Ban className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm text-red-600">Cancelar cartão</p>
+                  <p className="text-xs text-muted-foreground">Cancelamento permanente</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            {/* Compras Online */}
+            <div className="bg-card border rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <CreditCard className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">Compras online</p>
+                    <p className="text-xs text-muted-foreground">Habilitado</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" data-testid="button-toggle-online">
+                  Desabilitar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
