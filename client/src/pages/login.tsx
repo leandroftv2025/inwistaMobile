@@ -3,7 +3,6 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { CPFInput } from "@/components/cpf-input";
 import { ArrowLeft } from "lucide-react";
-import logoPath from "@assets/logo-inwista.png";
 
 function validateCPF(cpf: string): boolean {
   const cleanCPF = cpf.replace(/\D/g, "");
@@ -101,7 +100,7 @@ export default function Login() {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <div className="flex-1" />
-        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+        <img src="/attached_assets/logo-inwista.png" alt="Logo" className="h-8 sm:h-10" />
       </header>
 
       {/* Main Content */}

@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth-context";
-import logoPath from "@assets/logo-inwista.png";
+// Logo servido de public/attached_assets
 
 export default function TwoFA() {
   const [, setLocation] = useLocation();
@@ -90,7 +90,7 @@ export default function TwoFA() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header com logo no canto superior direito */}
       <header className="p-4 flex items-center justify-end">
-        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+        <img src="/attached_assets/logo-inwista.png" alt="Logo" className="h-8 sm:h-10" />
       </header>
 
       {/* Conteúdo principal em tela cheia */}

@@ -37,8 +37,10 @@ module.exports = {
       // ----------------------------------------
       // INSTÂNCIAS E MODO
       // ----------------------------------------
-      instances: 'max',              // Número de instâncias (1 ou 'max' para usar todos os CPUs)
-      exec_mode: 'cluster',          // 'cluster' para múltiplas instâncias, 'fork' para single
+      // IMPORTANTE: Fork mode (single instance) é necessário quando usando in-memory storage
+      // Se migrar para PostgreSQL real, pode usar 'max' + 'cluster' para melhor performance
+      instances: 1,                  // Single instance (necessário para in-memory storage)
+      exec_mode: 'fork',             // Fork mode para evitar problemas de memória compartilhada
 
       // ----------------------------------------
       // VARIÁVEIS DE AMBIENTE (desenvolvimento)

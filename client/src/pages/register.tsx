@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Pencil, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import logoPath from "@assets/logo-inwista.png";
+// Logo servido de public/attached_assets
 
 interface RegistrationData {
   fullName: string;
@@ -217,7 +217,7 @@ export default function Register() {
           <ArrowLeft className="w-6 h-6" />
         </Button>
         <div className="flex items-center gap-4">
-          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+          <img src="/attached_assets/logo-inwista.png" alt="Logo" className="h-8 sm:h-10" />
         </div>
       </header>
 
