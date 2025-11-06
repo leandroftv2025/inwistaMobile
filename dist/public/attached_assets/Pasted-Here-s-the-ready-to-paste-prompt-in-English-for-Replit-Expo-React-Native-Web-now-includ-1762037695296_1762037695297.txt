@@ -1,0 +1,221 @@
+Here’s the **ready-to-paste prompt in English for Replit (Expo / React Native + Web)**, now **including Inwista’s products/services** from the site.
+
+---
+
+# PROMPT — MVP **Inwista** (Replit / Expo — simulated features + product/service modules)
+
+**Role of the model:** Act as **product lead, tech lead, and UI/UX designer** to deliver a **navigable MVP** for **Inwista** with **simulated (mocked) features**, **fluid screen-to-screen navigation**, a **unified design system**, and a **modular architecture by product/service**.
+**Do not dump a huge project**: produce **clear architecture + essential components + stubs/mocks + runnable examples** sufficient for a functional prototype on **Replit**.
+
+---
+
+## 1) Goal
+
+* **Responsive/adaptive** app with **automatic light/dark mode** (follows OS theme) and a **manual toggle**.
+* **Multiplatform** from a single **Expo** project: **Web (major browsers), Tablets, iOS, and Android** (Expo for Web + simulators/Expo Go).
+* **Look & feel:** inspired by the attached BTG-style screens and by **Inwista’s identity/content**: [https://inwista.lovable.app/](https://inwista.lovable.app/)
+* **Integration-ready:** define interfaces/adapters so mocks can be replaced by real APIs later.
+* **Modularized by product/service** (e.g., **PIX**, **StableCOIN**, **Investments**, **Card**, **FX/Remittances**, **Support**, etc.).
+
+---
+
+## 2) Stack & conventions (Replit-friendly)
+
+* **TypeScript** + **Expo (React Native)** with **Expo Router** (universal navigation) and **Expo for Web**.
+* **Design System** with **design tokens** and **NativeWind** (Tailwind for RN/Web).
+* **State management:** Zustand (or RTK) per module; simulated persistence (AsyncStorage/LocalStorage).
+* **Mocks/APIs:** `msw` for Web and local stubs for mobile; `faker` for data.
+* **Accessibility (a11y):** roles/labels, visible focus, AA contrast, keyboard/screen-reader navigation.
+* **i18n:** PT-BR as default with structure ready for EN.
+* **Replit:** simple scripts (`npm run web`, `npm run ios`, `npm run android`) and auto build (Nixpacks/autodetect).
+
+---
+
+## 3) Sync products & services (from Inwista’s website)
+
+1. **Extract** from [https://inwista.lovable.app/](https://inwista.lovable.app/) the visible **products/services, short descriptions, and CTAs** (basic crawl/HTML parse).
+2. Output a **catalog file `catalog/products.json`** like:
+
+```json
+[
+  {"slug":"pix","name":"PIX","category":"payments","short":"Instant transfers","enabled":true},
+  {"slug":"stablecoin","name":"StableCOIN","category":"crypto","short":"BRL↔stable conversion","enabled":true},
+  {"slug":"investments","name":"Investments","category":"invest","short":"Applications & returns","enabled":true},
+  {"slug":"card","name":"Card","category":"banking","short":"Debit/Credit","enabled":false},
+  {"slug":"fx-remittance","name":"FX & Remittances","category":"fx","short":"International send/receive","enabled":false},
+  {"slug":"support","name":"Support","category":"help","short":"Help & FAQs","enabled":true}
+]
+```
+
+3. **Rule:** if the crawler cannot read some item, **keep the module with `enabled:false`** and show **“Coming soon”** in UI.
+4. **Dynamic UI:** **Home** reads `products.json` and **renders cards** for `enabled:true` (others appear disabled “Coming soon” with a preview screen).
+
+> Note: do **not invent** products—prefer items present on the site; mark the rest as **Coming soon**.
+
+---
+
+## 4) Screens & flows (simulated)
+
+1. **Onboarding/Welcome** (CTA “Get started”).
+2. **Authentication**
+
+   * CPF with mask, password, terms/privacy acceptance (simulated links).
+   * **Simulated 2FA** (SMS/email) + **token activation** (as in attached screens).
+3. **Home/Summary**
+
+   * “Net worth”, “Total invested”, **catalog cards** (PIX, StableCOIN, Investments, etc.), mocked activity feed.
+4. **PIX** — send/receive, QR generation, copy key, limits, **receipt** with share, **history**.
+5. **StableCOIN** — balance, **buy/sell/convert** BRL↔stable with mocked rate, spread/fee, wallet and TXs.
+6. **Investments** — list (Fixed Income, Funds, Stocks, Crypto), filters, **simulate deposit/redemption**, mocked D+ and returns, statement.
+7. **Card** — card status (mock), lock/unlock, limits (if `enabled:true`).
+8. **FX/Remittances** — quote and simulate remittances (if `enabled:true`).
+9. **Profile/Settings** — theme (Light/Dark/Auto), language, privacy, **simulated** biometrics.
+10. **Help/FAQ** — based on site content; **simulated** contact form.
+11. **Notifications** — **simulated** in-app push (badge + list).
+12. **UX states** — empty, loading, error, success.
+
+**Required end-to-end flows (clickable):**
+
+* **Sign-up/Login → 2FA → Activate token → Home**
+* **Home → PIX (Send/Receive) → Receipt → History**
+* **Home → StableCOIN (Buy/Sell/Convert) → Wallet**
+* **Home → Investments (Detail → Simulate → Confirm) → Statement**
+* **Home → Settings → Toggle Theme & Biometrics (simulated)**
+
+---
+
+## 5) Folder structure (Expo + Router, suited for Replit)
+
+```
+inwista-mvp/
+  app/                      # Expo Router (universal routes)
+    (auth)/login.tsx
+    (auth)/two-fa.tsx
+    (auth)/token-activate.tsx
+    (tabs)/index.tsx        # Home (tabs) → loads products.json and cards
+    pix/                    # PIX module routes
+    stablecoin/             # StableCOIN module
+    investments/            # Investments module
+    card/                   # Card module
+    fx-remittance/          # FX/Remittances module
+    settings/               # Profile/Settings
+    support/                # Help/FAQ
+  components/               # DS: Button, InputCPF, PasswordField, Card, etc.
+  core/
+    services/               # interfaces + mocks (PixService, StableCoinService, ...)
+    store/                  # Zustand slices per module
+    utils/                  # masks, formatters, theme utils
+  design/
+    tokens.ts               # color/spacing/typography tokens (light/dark)
+  public/
+    assets/                 # logos/icons
+  catalog/
+    products.json           # site-driven catalog (see Section 3)
+  mocks/
+    fixtures/               # fake data
+  scripts/
+    crawl-inwista.js        # site crawler → products.json (with fallback)
+  package.json
+  app.json
+  tsconfig.json
+  README.md
+```
+
+---
+
+## 6) Design system (minimum example)
+
+* **Colors:** derive from Inwista site (primary blue, turquoise accent, grays).
+* **Tokens** in `design/tokens.ts` with **light/dark variants** (auto) + **manual toggle**.
+* **Base components:** `AppHeader`, `AppLogo`, `Button`, `IconButton`, `InputCPF` (mask), `PasswordField`, `Card`, `ListItem`, `EmptyState`, `Loading`, `ErrorMessage`, `TabBar` (mobile), `Sidebar` (web).
+
+---
+
+## 7) Services & mocks (contracts ready for real APIs later)
+
+Create interfaces and fake implementations with **configurable delay** and **controlled random errors**:
+
+* `PixService` — `getKeys()`, `createQr()`, `sendPix()`, `getHistory()`.
+* `StableCoinService` — `getRates()`, `convert()`, `wallet()`, `listTx()`.
+* `InvestmentsService` — `listProducts()`, `simulate()`, `subscribe()`, `redemption()`, `statement()`.
+
+---
+
+## 8) What to DELIVER (output format)
+
+1. **Solution summary** (1–2 paragraphs).
+2. **Route map** (Expo Router) and **folder structure** (as above).
+3. **Design tokens** (`tokens.ts`) + example for **auto theme + manual toggle**.
+4. **Base components** with short examples (`tsx`).
+5. **Service stubs/mocks** (PIX, StableCOIN, Investments) in TS.
+6. **Simple crawler** (Node script) to fill `catalog/products.json` from the site.
+7. **Screen/flow examples** (essential code) — login/2FA/token, Home with dynamic cards, PIX, StableCOIN, Investments.
+8. **Replit run guide**:
+
+   * `npm install`
+   * `npm run web` (Web/PWA)
+   * `npm run ios` / `npm run android` (with Expo Go/simulator)
+   * quick note on editing `catalog/products.json` if the crawler can’t run.
+9. **QA checklist** (responsiveness, dark mode, a11y, navigation, states).
+
+> **Reminder:** keep code **lean and practical**; focus on **architecture, examples, and mocks**—no massive dumps.
+
+---
+
+## 9) Acceptance criteria
+
+* Runs on **Web, iOS, and Android** via Expo; **responsive/adaptive** + **auto/manual dark mode**.
+* **Clickable end-to-end flows** with simulated data and smooth navigation.
+* **Product/service modules** (from the site) with service contracts + mocks.
+* **Home** is **dynamic** based on `catalog/products.json`.
+* Visual style respects **Inwista identity** (site) with **BTG-like** aesthetics (attached references).
+* **Basic accessibility** and **best practices** applied.
+
+---
+
+## 10) Extras (optional)
+
+* **PWA** for Web (install + asset caching).
+* **Deep links** (mobile) and **share** for receipts.
+* **Feature flags** per module.
+
+---
+
+## 11) References (authoritative sources)
+
+* Inwista identity/content: [https://inwista.lovable.app/](https://inwista.lovable.app/)
+* Material Design 3 (Android/Web): [https://m3.material.io/](https://m3.material.io/)
+* Apple Human Interface Guidelines (iOS/iPadOS): [https://developer.apple.com/design/human-interface-guidelines/](https://developer.apple.com/design/human-interface-guidelines/)
+* WCAG (Accessibility): [https://www.w3.org/WAI/standards-guidelines/wcag/](https://www.w3.org/WAI/standards-guidelines/wcag/)
+* PWA best practices: [https://web.dev/progressive-web-apps/](https://web.dev/progressive-web-apps/)
+
+---
+
+## 12) Output formatting
+
+* Organize the response into **numbered sections 1–9** (or 1–12 including references), with **short code blocks** (`ts`, `tsx`, `json`).
+* Provide **ready scripts** in `package.json` for Replit:
+
+```json
+{
+  "scripts": {
+    "start": "expo start",
+    "web": "expo start --web",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "crawl:catalog": "node scripts/crawl-inwista.js"
+  }
+}
+```
+
+* Include the **`scripts/crawl-inwista.js`** Node script that reads the site HTML and fills `catalog/products.json` (with a manual fallback if crawling is not allowed).
+
+---
+
+**Now produce the full result exactly as requested**:
+
+* Implement the **dynamic catalog** from Inwista’s site (crawler + fallback).
+* Deliver **tokens, components, mocked services, key screens, and simulated flows** in **lean, runnable code**.
+* Ensure it **runs on Replit** with the scripts above and the architecture is ready to **swap mocks for real APIs**.
+
+**Important:** when in doubt about products/services, **do not fabricate**—mark as **“Coming soon”**.
