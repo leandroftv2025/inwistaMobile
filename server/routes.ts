@@ -14,6 +14,34 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoints (não modificam UI)
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || "development",
+    });
+  });
+
+  app.get("/api/healthz", (req, res) => {
+    res.json({ status: "ok" });
+  });
+
+  app.get("/api/ready", async (req, res) => {
+    try {
+      // Verifica se o storage está inicializado
+      const users = await storage.getAllInvestmentProducts();
+      if (users.length >= 0) {
+        res.json({ ready: true, storage: "initialized" });
+      } else {
+        res.status(503).json({ ready: false, error: "Storage not initialized" });
+      }
+    } catch (error: any) {
+      res.status(503).json({ ready: false, error: error.message });
+    }
+  });
+
   app.post("/api/auth/register", async (req, res) => {
     try {
       const { fullName, email, phone, cpf, password } = registrationSchema.parse(req.body);

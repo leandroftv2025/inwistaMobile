@@ -1,0 +1,194 @@
+# ====================================
+# INWISTAMOBILE - DOCKER COMPOSE (DESENVOLVIMENTO)
+# ====================================
+# Stack completa: App + PostgreSQL + Redis (opcional)
+
+version: '3.9'
+
+services:
+  # ----------------------------------------
+  # APLICAÇÃO PRINCIPAL (inwistaMobile)
+  # ----------------------------------------
+  app:
+    container_name: inwistamobile-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder  # Usa stage de dev para hot reload
+    image: inwistamobile:dev
+    ports:
+      - "5000:5000"    # HTTP
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DATABASE_URL=postgresql://inwista:inwista_password@postgres:5432/inwistamobile
+      - SESSION_SECRET=development-secret-change-in-production
+      - LOG_LEVEL=debug
+      - DEBUG=true
+    volumes:
+      # Monta código-fonte para hot reload (desenvolvimento)
+      - ./client:/app/client
+      - ./server:/app/server
+      - ./shared:/app/shared
+      - ./catalog:/app/catalog
+      # Prevenir que node_modules seja sobrescrito
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
+    networks:
+      - inwista-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    command: npm run dev  # Hot reload em desenvolvimento
+
+  # ----------------------------------------
+  # BANCO DE DADOS (PostgreSQL 16)
+  # ----------------------------------------
+  postgres:
+    container_name: inwistamobile-postgres
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"    # Exposto para ferramentas externas (pgAdmin, DBeaver)
+    environment:
+      POSTGRES_DB: inwistamobile
+      POSTGRES_USER: inwista
+      POSTGRES_PASSWORD: inwista_password  # MUDAR EM PRODUÇÃO!
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=pt_BR.UTF-8"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Script de inicialização (opcional)
+      # - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - inwista-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inwista -d inwistamobile"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Performance tuning (ajustar conforme recursos da máquina)
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "default_statistics_target=100"
+
+  # ----------------------------------------
+  # CACHE (Redis 7 - OPCIONAL)
+  # ----------------------------------------
+  # Descomente se precisar de cache/session storage
+  # redis:
+  #   container_name: inwistamobile-redis
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - inwista-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 3
+  #   command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  # ----------------------------------------
+  # ADMINER (Interface Web para PostgreSQL - DEV)
+  # ----------------------------------------
+  adminer:
+    container_name: inwistamobile-adminer
+    image: adminer:latest
+    ports:
+      - "8081:8080"    # Acesse http://localhost:8081
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: nette
+    networks:
+      - inwista-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    # Remover em produção (somente para dev)
+    profiles:
+      - dev
+
+# ----------------------------------------
+# NETWORKS
+# ----------------------------------------
+networks:
+  inwista-network:
+    name: inwista-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ----------------------------------------
+# VOLUMES (persistência de dados)
+# ----------------------------------------
+volumes:
+  postgres-data:
+    name: inwistamobile-postgres-data
+    driver: local
+  # redis-data:
+  #   name: inwistamobile-redis-data
+  #   driver: local
+
+# ----------------------------------------
+# COMANDOS ÚTEIS
+# ----------------------------------------
+# Iniciar stack completa:
+#   docker compose up -d
+#
+# Iniciar com perfil dev (inclui Adminer):
+#   docker compose --profile dev up -d
+#
+# Ver logs em tempo real:
+#   docker compose logs -f app
+#
+# Rebuild e reiniciar:
+#   docker compose up -d --build
+#
+# Parar todos os serviços:
+#   docker compose down
+#
+# Parar e remover volumes (CUIDADO: apaga dados!):
+#   docker compose down -v
+#
+# Executar migrations:
+#   docker compose exec app npm run db:push
+#
+# Acessar shell do container:
+#   docker compose exec app sh
+#
+# Acessar PostgreSQL CLI:
+#   docker compose exec postgres psql -U inwista -d inwistamobile
+#
+# Ver status dos serviços:
+#   docker compose ps
+#
+# Ver recursos consumidos:
+#   docker stats

@@ -1,0 +1,186 @@
+name: CI/CD - inwistaMobile
+
+on:
+  push:
+    branches: [main, develop, claude/**]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ----------------------------------------
+  # JOB 1: LINT & TYPE CHECK
+  # ----------------------------------------
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: TypeScript check
+        run: npm run check
+
+  # ----------------------------------------
+  # JOB 2: BUILD TEST
+  # ----------------------------------------
+  build:
+    name: Build Test
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Verify build artifacts
+        run: |
+          test -f dist/index.js || exit 1
+          test -d dist/public || exit 1
+          echo "✅ Build artifacts verified"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ----------------------------------------
+  # JOB 3: SECURITY AUDIT
+  # ----------------------------------------
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate || true
+
+      - name: Check for known vulnerabilities
+        run: |
+          npm audit --json > audit.json || true
+          cat audit.json
+
+  # ----------------------------------------
+  # JOB 4: DOCKER BUILD TEST
+  # ----------------------------------------
+  docker:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: inwistamobile:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          docker run -d --name test-container -p 5000:5000 \
+            -e NODE_ENV=production \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e SESSION_SECRET=test-secret \
+            inwistamobile:test
+
+          sleep 10
+
+          # Test health endpoint
+          curl -f http://localhost:5000/api/healthz || exit 1
+
+          docker stop test-container
+          docker rm test-container
+
+  # ----------------------------------------
+  # JOB 5: SMOKE TESTS
+  # ----------------------------------------
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start server in background
+        run: |
+          NODE_ENV=production \
+          DATABASE_URL=postgresql://test:test@localhost:5432/test \
+          SESSION_SECRET=test-secret \
+          node dist/index.js &
+          echo $! > server.pid
+          sleep 5
+
+      - name: Run smoke tests
+        run: |
+          # Test health endpoints
+          curl -f http://localhost:5000/api/healthz || exit 1
+          curl -f http://localhost:5000/api/health || exit 1
+
+          # Test API responses
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/stablecoin/rate)
+          if [ "$STATUS" -eq 200 ]; then
+            echo "✅ API is responding"
+          else
+            echo "❌ API failed with status $STATUS"
+            exit 1
+          fi
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi

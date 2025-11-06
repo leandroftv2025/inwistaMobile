@@ -1,0 +1,103 @@
+# ====================================
+# EDITORCONFIG - INWISTA
+# ====================================
+# Configuração consistente entre editores
+# https://editorconfig.org
+
+root = true
+
+# ----------------------------------------
+# PADRÕES GLOBAIS
+# ----------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# ----------------------------------------
+# JAVASCRIPT/TYPESCRIPT
+# ----------------------------------------
+[*.{js,jsx,ts,tsx,mjs,cjs}]
+indent_size = 2
+quote_type = double
+
+# ----------------------------------------
+# JSON
+# ----------------------------------------
+[*.json]
+indent_size = 2
+
+# ----------------------------------------
+# YAML
+# ----------------------------------------
+[*.{yml,yaml}]
+indent_size = 2
+
+# ----------------------------------------
+# MARKDOWN
+# ----------------------------------------
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 100
+
+# ----------------------------------------
+# SHELL SCRIPTS
+# ----------------------------------------
+[*.sh]
+indent_size = 4
+end_of_line = lf
+
+# ----------------------------------------
+# MAKEFILE
+# ----------------------------------------
+[Makefile]
+indent_style = tab
+
+# ----------------------------------------
+# DOCKER
+# ----------------------------------------
+[Dockerfile*]
+indent_size = 2
+
+[docker-compose*.yml]
+indent_size = 2
+
+# ----------------------------------------
+# NGINX
+# ----------------------------------------
+[*.conf]
+indent_size = 4
+
+# ----------------------------------------
+# CSS
+# ----------------------------------------
+[*.{css,scss,sass,less}]
+indent_size = 2
+
+# ----------------------------------------
+# HTML
+# ----------------------------------------
+[*.html]
+indent_size = 2
+
+# ----------------------------------------
+# SQL
+# ----------------------------------------
+[*.sql]
+indent_size = 2
+
+# ----------------------------------------
+# PACKAGE MANAGERS
+# ----------------------------------------
+[package.json]
+indent_size = 2
+
+[package-lock.json]
+indent_size = 2
+insert_final_newline = false
+
+[*.lock]
+insert_final_newline = false
