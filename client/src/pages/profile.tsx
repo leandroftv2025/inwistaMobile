@@ -143,7 +143,7 @@ export default function Profile() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground">Telefone</p>
-                    <p className="font-medium">(11) 98765-4321</p>
+                    <p className="font-medium">{userData?.phone || '(11) 98765-4321'}</p>
                   </div>
                 </div>
 
