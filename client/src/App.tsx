@@ -15,6 +15,7 @@ import Home from "@/pages/home";
 import PIX from "@/pages/pix";
 import StableCOIN from "@/pages/stablecoin";
 import Investments from "@/pages/investments";
+import Cards from "@/pages/cards";
 import Settings from "@/pages/settings";
 import Support from "@/pages/support";
 import Profile from "@/pages/profile";
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/pix" component={PIX} />
       <Route path="/stablecoin" component={StableCOIN} />
       <Route path="/investments" component={Investments} />
+      <Route path="/card" component={Cards} />
       <Route path="/settings" component={Settings} />
       <Route path="/support" component={Support} />
       <Route path="/profile" component={Profile} />

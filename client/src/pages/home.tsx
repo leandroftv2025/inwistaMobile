@@ -134,9 +134,9 @@ export default function Home() {
       icon: CreditCard,
       name: 'Cartão',
       description: 'Débito e crédito',
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted',
-      enabled: false,
+      color: 'text-chart-4',
+      bgColor: 'bg-chart-4/10',
+      enabled: true,
       isImage: false,
     },
     {
