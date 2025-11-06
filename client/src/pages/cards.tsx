@@ -25,49 +25,84 @@ export default function Cards() {
   const cards = [
     {
       id: "1",
-      name: "Latam Pass Itau Black",
+      name: "Cartão de Crédito",
       type: "Crédito",
       lastDigits: "9678",
       brand: "mastercard",
     },
-    {
-      id: "2",
-      name: "Personnalite Black",
-      type: "Crédito",
-      lastDigits: "7111",
-      brand: "mastercard",
-    },
   ];
 
-  // Dados simulados de transações
+  // Dados simulados de transações que totalizam R$ 5.433,14
   const transactions = [
     {
       id: "1",
-      date: "ontem, 04 de novembro",
-      merchant: "adobe",
-      type: "cartão virtual",
-      amount: -47.50,
+      date: "05 de novembro",
+      merchant: "Mercado Livre",
+      type: "compra online",
+      amount: -1250.00,
     },
     {
       id: "2",
-      date: "ontem, 04 de novembro",
-      merchant: "adobe",
-      type: "cartão virtual",
-      amount: -47.50,
+      date: "05 de novembro",
+      merchant: "Amazon",
+      type: "compra online",
+      amount: -845.90,
     },
     {
       id: "3",
-      date: "02 de novembro",
-      merchant: "netflix.com",
-      type: "cartão virtual",
-      amount: -44.90,
+      date: "04 de novembro",
+      merchant: "Posto Ipiranga",
+      type: "combustível",
+      amount: -320.50,
     },
     {
       id: "4",
-      date: "01 de novembro",
-      merchant: "netflix.com",
-      type: "cartão virtual",
+      date: "04 de novembro",
+      merchant: "Restaurante Fogo de Chão",
+      type: "alimentação",
+      amount: -567.80,
+    },
+    {
+      id: "5",
+      date: "03 de novembro",
+      merchant: "Magazine Luiza",
+      type: "compra parcelada",
+      amount: -1150.00,
+    },
+    {
+      id: "6",
+      date: "03 de novembro",
+      merchant: "Uber",
+      type: "transporte",
+      amount: -48.50,
+    },
+    {
+      id: "7",
+      date: "02 de novembro",
+      merchant: "Netflix",
+      type: "assinatura",
       amount: -44.90,
+    },
+    {
+      id: "8",
+      date: "02 de novembro",
+      merchant: "Spotify",
+      type: "assinatura",
+      amount: -21.90,
+    },
+    {
+      id: "9",
+      date: "01 de novembro",
+      merchant: "Farmácia São Paulo",
+      type: "saúde",
+      amount: -285.40,
+    },
+    {
+      id: "10",
+      date: "01 de novembro",
+      merchant: "Supermercado Extra",
+      type: "supermercado",
+      amount: -898.24,
     },
   ];
 
@@ -125,7 +160,7 @@ export default function Cards() {
                     onClick={() => setCurrentCardIndex(index)}
                   >
                     <div
-                      className="relative aspect-[1.586/1] cursor-pointer"
+                      className="relative aspect-[1.586/1] cursor-pointer bg-muted rounded-2xl overflow-hidden"
                       onClick={() => setShowCardBack(!showCardBack)}
                       data-testid={`card-${index}`}
                     >
@@ -134,28 +169,20 @@ export default function Cards() {
                           <img
                             src={cardFrontPath}
                             alt="Frente do cartão"
-                            className="w-full h-full object-cover rounded-2xl"
+                            className="w-full h-full object-contain"
                           />
                           {/* Nome do usuário sobreposto */}
-                          {userData && 'name' in userData && (
-                            <div className="absolute bottom-6 left-6 text-white/90 text-sm font-medium uppercase tracking-wider">
-                              {(userData as { name: string }).name}
+                          {userData && typeof userData === 'object' && 'name' in userData && (
+                            <div className="absolute bottom-[18%] left-[8%] text-white text-xs font-medium uppercase tracking-wider">
+                              {userData.name}
                             </div>
                           )}
-                          {/* Info do cartão */}
-                          <div className="absolute top-6 left-6 text-white space-y-1">
-                            <p className="text-sm font-medium">{card.name}</p>
-                            <p className="text-xs opacity-80">{card.type}</p>
-                          </div>
-                          <div className="absolute top-6 right-6 text-white text-sm font-medium">
-                            final {card.lastDigits}
-                          </div>
                         </div>
                       ) : (
                         <img
                           src={cardBackPath}
                           alt="Verso do cartão"
-                          className="w-full h-full object-cover rounded-2xl"
+                          className="w-full h-full object-contain"
                         />
                       )}
                     </div>
@@ -164,19 +191,6 @@ export default function Cards() {
               </div>
             </div>
             
-            {/* Pagination dots */}
-            <div className="flex justify-center gap-2 mt-2">
-              {cards.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentCardIndex
-                      ? "w-6 bg-primary"
-                      : "w-2 bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
           </div>
 
           {/* Fatura Aberta */}
@@ -209,7 +223,7 @@ export default function Cards() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Limite disponível</p>
-                <p className="text-xl font-semibold">R$ 32,82</p>
+                <p className="text-xl font-semibold">R$ 500.000,00</p>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
@@ -219,7 +233,7 @@ export default function Cards() {
           <div className="bg-card border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium">Milhas e Benefícios Latam</p>
+                <p className="text-sm font-medium">Milhas e Benefícios</p>
               </div>
               <Button
                 variant="ghost"
@@ -298,24 +312,6 @@ export default function Cards() {
                 <Settings className="w-4 h-4 mr-1" />
                 Filtros
               </Button>
-            </div>
-
-            {/* Alert */}
-            <div className="bg-muted/50 border rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Alívio para o seu cartão</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Aproveite a solução disponível para continuar em dia
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              </div>
             </div>
 
             {/* Transactions by Date */}
