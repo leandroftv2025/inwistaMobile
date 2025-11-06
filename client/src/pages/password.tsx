@@ -100,9 +100,7 @@ export default function Password() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center justify-between">
-        <div className="w-12 h-12">
-          <img src={logoPath} alt="Logo" className="w-full h-full object-contain" />
-        </div>
+        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
         <div className="text-center flex-1">
           <p className="text-sm text-muted-foreground">{userData?.name || "Carregando..."}</p>
           <button

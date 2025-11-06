@@ -101,9 +101,7 @@ export default function Login() {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <div className="flex-1" />
-        <div className="w-12 h-12">
-          <img src={logoPath} alt="Logo" className="w-full h-full object-contain" />
-        </div>
+        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
       </header>
 
       {/* Main Content */}
