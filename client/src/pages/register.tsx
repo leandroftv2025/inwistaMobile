@@ -452,7 +452,7 @@ export default function Register() {
                           const value = e.target.value.replace(/\D/g, "");
                           if (value.length <= 6) {
                             setFormData({ ...formData, confirmPassword: value });
-                            if (value.length === 6 && formData.password.length === 6) {
+                            if (value.length === 6 && formData.password.length === 6 && formData.password === value) {
                               setTimeout(() => {
                                 handleNext();
                               }, 100);
