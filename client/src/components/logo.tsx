@@ -12,7 +12,7 @@ export function Logo({ className = "", size = "md" }: LogoProps) {
 
   return (
     <img
-      src="/attached_assets/Logo Inwista_1762037237480.png"
+      src="/attached_assets/logo-inwista.png"
       alt="Inwista"
       className={`${sizeClasses[size]} ${className}`}
       data-testid="img-logo"
