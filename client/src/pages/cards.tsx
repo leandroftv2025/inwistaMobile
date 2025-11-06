@@ -183,27 +183,28 @@ export default function Cards() {
                       onClick={() => setShowCardBack(!showCardBack)}
                       data-testid={`card-${index}`}
                     >
-                      {!showCardBack ? (
-                        <div className="relative w-full h-full flex items-center justify-center">
-                          <img
-                            src={cardFrontPath}
-                            alt="Frente do cartão"
-                            className="w-full h-full object-cover rounded-2xl"
-                          />
-                          {/* Nome do usuário sobreposto */}
-                          {userData && (
-                            <div className="absolute bottom-[18%] left-[8%] text-white text-xs font-medium uppercase tracking-wider">
-                              {userData.name}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="relative w-full h-full flex items-center justify-center">
-                          <img
-                            src={cardBackPath}
-                            alt="Verso do cartão"
-                            className="w-full h-full object-cover rounded-2xl"
-                          />
+                      {/* Front Card Image */}
+                      <img
+                        src={cardFrontPath}
+                        alt="Frente do cartão"
+                        className={`absolute inset-0 left-1/2 top-1/2 w-full h-full max-w-full max-h-full -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-300 ${
+                          showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
+                        }`}
+                      />
+                      
+                      {/* Back Card Image */}
+                      <img
+                        src={cardBackPath}
+                        alt="Verso do cartão"
+                        className={`absolute inset-0 left-1/2 top-1/2 w-full h-full max-w-full max-h-full -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-300 ${
+                          showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'
+                        }`}
+                      />
+                      
+                      {/* Nome do usuário sobreposto */}
+                      {userData && !showCardBack && (
+                        <div className="absolute bottom-[18%] left-[8%] text-white text-xs font-medium uppercase tracking-wider z-10">
+                          {userData.name}
                         </div>
                       )}
                     </div>
