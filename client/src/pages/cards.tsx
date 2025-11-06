@@ -202,7 +202,7 @@ export default function Cards() {
                     
                     {/* Nome do usuário sobreposto */}
                     {userData && !showCardBack && (
-                      <div className="absolute bottom-[11%] left-[3.5%] text-gray-400 text-[13px] font-medium uppercase tracking-wide z-10">
+                      <div className="absolute bottom-[11%] left-[11.5%] text-gray-400 text-[13px] font-medium uppercase tracking-wide z-10">
                         {(() => {
                           const nameParts = userData.name.trim().split(' ');
                           if (nameParts.length === 1) return nameParts[0];
