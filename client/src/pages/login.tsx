@@ -1,10 +1,37 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { CPFInput } from "@/components/cpf-input";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { CPFInput } from "@/components/cpf-input";
+import { ArrowLeft } from "lucide-react";
+import logoPath from "@assets/logo-inwista.png";
+
+function validateCPF(cpf: string): boolean {
+  const cleanCPF = cpf.replace(/\D/g, "");
+  
+  if (cleanCPF.length !== 11) return false;
+  
+  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
+  
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
+  }
+  let digit1 = 11 - (sum % 11);
+  if (digit1 > 9) digit1 = 0;
+  
+  if (parseInt(cleanCPF.charAt(9)) !== digit1) return false;
+  
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
+  }
+  let digit2 = 11 - (sum % 11);
+  if (digit2 > 9) digit2 = 0;
+  
+  if (parseInt(cleanCPF.charAt(10)) !== digit2) return false;
+  
+  return true;
+}
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -19,11 +46,11 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (cpf.replace(/\D/g, "").length !== 11) {
+    if (!validateCPF(cpf)) {
       toast({
         variant: "destructive",
         title: "CPF inválido",
-        description: "Por favor, digite um CPF válido com 11 dígitos",
+        description: "Por favor, digite um CPF válido",
       });
       return;
     }
@@ -33,60 +60,78 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Card className="bg-white">
-          <CardHeader className="space-y-4 pt-8 pb-6">
-            <div className="space-y-3 text-center">
-              <CardTitle className="text-2xl font-medium">Para começar, qual é o número do seu CPF?</CardTitle>
-              <CardDescription className="text-base">Digite seu CPF para continuar</CardDescription>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="p-4 flex items-center justify-between">
+        <button
+          onClick={() => setLocation("/")}
+          className="w-12 h-12 flex items-center justify-center text-foreground hover:text-primary transition-colors"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <div className="flex-1" />
+        <div className="w-12 h-12">
+          <img src={logoPath} alt="Logo" className="w-full h-full object-contain" />
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col justify-center px-6 pb-12">
+        <div className="w-full max-w-md mx-auto space-y-8">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-normal text-left">
+              Para começar, qual é o número do seu CPF?
+            </h1>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-2">
+              <CPFInput
+                id="cpf"
+                value={cpf}
+                onChange={setCpf}
+                autoFocus
+                placeholder="000.000.000-00"
+                className="h-14 text-lg"
+                data-testid="input-cpf"
+              />
             </div>
-          </CardHeader>
-          <CardContent className="px-8 pb-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="cpf" className="text-base">CPF</Label>
-                <CPFInput
-                  id="cpf"
-                  value={cpf}
-                  onChange={setCpf}
-                  autoFocus
-                  className="h-12 text-base"
-                  data-testid="input-cpf"
-                />
-              </div>
 
-              <div className="pt-2 space-y-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                  <p className="font-medium text-blue-900 mb-1">CPF de demonstração:</p>
-                  <p className="text-blue-800">CPF: <span className="font-mono font-semibold">123.456.789-00</span></p>
-                </div>
-              </div>
+            <button
+              type="submit"
+              className="w-full h-14 bg-[#103549] text-white rounded-md font-medium text-lg hover:bg-[#0a2838] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={cpf.replace(/\D/g, "").length !== 11}
+              data-testid="button-submit"
+            >
+              Continuar
+            </button>
+          </form>
 
-              <Button
-                type="submit"
-                className="w-full min-h-12 text-base font-medium"
-                data-testid="button-submit"
-              >
-                Continuar
-              </Button>
-            </form>
-
-            <div className="mt-8 pt-6 border-t">
-              <p className="text-sm text-muted-foreground text-center">
-                Ao continuar, estou de acordo com a{" "}
-                <a href="#" className="text-primary hover:underline">
-                  Política de privacidade
-                </a>{" "}
-                e{" "}
-                <a href="#" className="text-primary hover:underline">
-                  Termos de uso
-                </a>
+          <div className="pt-4">
+            <div className="bg-muted/50 border border-border rounded-lg p-4">
+              <p className="text-sm font-medium text-foreground mb-1">CPF de demonstração:</p>
+              <p className="text-sm text-muted-foreground">
+                CPF: <span className="font-mono font-semibold text-foreground">123.456.789-00</span>
               </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="p-6 pb-8">
+        <p className="text-sm text-muted-foreground text-center">
+          Ao continuar, estou de acordo com a{" "}
+          <a href="#" className="text-primary hover:underline">
+            Política de privacidade
+          </a>{" "}
+          e{" "}
+          <a href="#" className="text-primary hover:underline">
+            Termos de uso
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
