@@ -1,10 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, Delete, Shield } from "lucide-react";
 import logoPath from "@assets/logo-inwista.png";
+
+function generateRandomKeypadPairs() {
+  const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  
+  for (let i = digits.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [digits[i], digits[j]] = [digits[j], digits[i]];
+  }
+  
+  const pairs = [];
+  for (let i = 0; i < digits.length; i += 2) {
+    pairs.push({
+      label: `${digits[i]} ou ${digits[i + 1]}`,
+      digits: [digits[i].toString(), digits[i + 1].toString()]
+    });
+  }
+  
+  return pairs;
+}
 
 export default function Password() {
   const [, setLocation] = useLocation();
@@ -13,6 +32,8 @@ export default function Password() {
   const [cpf, setCpf] = useState("");
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [pressedButton, setPressedButton] = useState<number | null>(null);
+  
+  const keypadButtons = useMemo(() => generateRandomKeypadPairs(), []);
 
   useEffect(() => {
     const storedCpf = localStorage.getItem("inwista-cpf");
@@ -92,14 +113,6 @@ export default function Password() {
     }
   }, [password]);
 
-  const keypadButtons = [
-    { label: "5 ou 8", digits: ["5", "8"] },
-    { label: "4 ou 0", digits: ["4", "0"] },
-    { label: "6 ou 1", digits: ["6", "1"] },
-    { label: "3 ou 2", digits: ["3", "2"] },
-    { label: "9 ou 7", digits: ["9", "7"] },
-  ];
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
@@ -144,27 +157,38 @@ export default function Password() {
             {keypadButtons.slice(0, 3).map((btn, idx) => (
               <div 
                 key={idx} 
-                className={`relative aspect-square rounded-full flex items-center justify-center p-2 transition-all ${
+                className={`relative aspect-square rounded-full flex flex-col items-center justify-center p-2 transition-all ${
                   pressedButton === idx
                     ? "bg-[#103549]"
                     : "bg-muted"
                 }`}
               >
-                <div className="flex items-center justify-center gap-2 w-full h-full">
-                  {btn.digits.map((digit) => (
-                    <button
-                      key={digit}
-                      onClick={() => handleNumberPress(digit, idx)}
-                      className={`min-h-11 min-w-11 rounded-full text-base font-medium transition-colors flex items-center justify-center ${
-                        pressedButton === idx
-                          ? "text-white"
-                          : "text-foreground"
-                      }`}
-                      data-testid={`button-key-${digit}`}
-                    >
-                      {digit}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-center gap-1 w-full h-full">
+                  <button
+                    onClick={() => handleNumberPress(btn.digits[0], idx)}
+                    className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
+                      pressedButton === idx
+                        ? "text-white"
+                        : "text-foreground"
+                    }`}
+                    data-testid={`button-key-${btn.digits[0]}`}
+                  >
+                    {btn.digits[0]}
+                  </button>
+                  <span className={`text-xs ${pressedButton === idx ? "text-white" : "text-muted-foreground"}`}>
+                    ou
+                  </span>
+                  <button
+                    onClick={() => handleNumberPress(btn.digits[1], idx)}
+                    className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
+                      pressedButton === idx
+                        ? "text-white"
+                        : "text-foreground"
+                    }`}
+                    data-testid={`button-key-${btn.digits[1]}`}
+                  >
+                    {btn.digits[1]}
+                  </button>
                 </div>
               </div>
             ))}
@@ -177,27 +201,38 @@ export default function Password() {
               return (
                 <div 
                   key={idx} 
-                  className={`relative aspect-square rounded-full flex items-center justify-center p-2 transition-all ${
+                  className={`relative aspect-square rounded-full flex flex-col items-center justify-center p-2 transition-all ${
                     pressedButton === buttonIndex
                       ? "bg-[#103549]"
                       : "bg-muted"
                   }`}
                 >
-                  <div className="flex items-center justify-center gap-2 w-full h-full">
-                    {btn.digits.map((digit) => (
-                      <button
-                        key={digit}
-                        onClick={() => handleNumberPress(digit, buttonIndex)}
-                        className={`min-h-11 min-w-11 rounded-full text-base font-medium transition-colors flex items-center justify-center ${
-                          pressedButton === buttonIndex
-                            ? "text-white"
-                            : "text-foreground"
-                        }`}
-                        data-testid={`button-key-${digit}`}
-                      >
-                        {digit}
-                      </button>
-                    ))}
+                  <div className="flex items-center justify-center gap-1 w-full h-full">
+                    <button
+                      onClick={() => handleNumberPress(btn.digits[0], buttonIndex)}
+                      className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
+                        pressedButton === buttonIndex
+                          ? "text-white"
+                          : "text-foreground"
+                      }`}
+                      data-testid={`button-key-${btn.digits[0]}`}
+                    >
+                      {btn.digits[0]}
+                    </button>
+                    <span className={`text-xs ${pressedButton === buttonIndex ? "text-white" : "text-muted-foreground"}`}>
+                      ou
+                    </span>
+                    <button
+                      onClick={() => handleNumberPress(btn.digits[1], buttonIndex)}
+                      className={`min-h-11 min-w-11 rounded-full text-lg font-medium transition-colors flex items-center justify-center ${
+                        pressedButton === buttonIndex
+                          ? "text-white"
+                          : "text-foreground"
+                      }`}
+                      data-testid={`button-key-${btn.digits[1]}`}
+                    >
+                      {btn.digits[1]}
+                    </button>
                   </div>
                 </div>
               );
