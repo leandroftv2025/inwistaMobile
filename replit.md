@@ -109,15 +109,26 @@ inwista/
 ## Features
 
 ### 1. Authentication & Security
-- CPF-based login with input masking
+- CPF-based login with input masking and validation
+- Banking-style randomized keypad with Fisher-Yates shuffle
+- Keypad displays digit pairs (e.g., "5 ou 8") that randomize on each page load
+- Server-side sequence validation prevents PIN enumeration attacks
 - Simulated 2FA with 8-digit code
 - Auth context for session management
-- Secure password handling (excluded from API responses)
+- Secure PIN handling (never exposed to frontend)
 
 **Demo Credentials:**
 - CPF: `123.456.789-00`
-- Password: `123456`
+- PIN: `123456` (6 digits)
 - 2FA Code: Any 8 digits (e.g., `12345678`)
+
+**Security Implementation:**
+- Two-step login: CPF entry → randomized PIN keypad → 2FA
+- PIN validation via `/api/auth/validate-keypad-sequence` endpoint
+- All-or-nothing validation (must get all 6 positions correct)
+- No individual digit exposure (sends entire sequence of pairs)
+- Generic error messages (no positional hints)
+- Protection against shoulder surfing (attacker doesn't know which digit was selected from each pair)
 
 ### 2. Home Dashboard
 - Net worth summary with real-time balance display
