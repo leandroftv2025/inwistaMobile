@@ -140,13 +140,13 @@ export default function Home() {
       isImage: false,
     },
     {
-      slug: 'fx-remittance',
+      slug: 'cambio',
       icon: Globe,
-      name: 'Câmbio e Remessas',
+      name: 'Câmbio',
       description: 'Envios internacionais',
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted',
-      enabled: false,
+      color: 'text-chart-5',
+      bgColor: 'bg-chart-5/10',
+      enabled: true,
       isImage: false,
     },
   ];
