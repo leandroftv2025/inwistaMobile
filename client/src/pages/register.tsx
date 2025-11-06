@@ -70,7 +70,7 @@ export default function Register() {
     const storedCPF = localStorage.getItem("inwista-register-cpf");
     if (storedCPF) {
       setFormData(prev => ({ ...prev, cpf: storedCPF }));
-      setStep(4); // Pula para o step do CPF
+      // Inicia do step 1 (nome), mas com CPF já preenchido
       localStorage.removeItem("inwista-register-cpf");
     }
   }, []);
