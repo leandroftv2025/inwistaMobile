@@ -51,16 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "CPF já cadastrado" });
       }
 
-      // Gerar saldos aleatórios
-      // BRL: entre 1.000.000,00 e 50.000.000,00
-      const minBRL = 1000000;
-      const maxBRL = 50000000;
-      const randomBalanceBRL = (Math.random() * (maxBRL - minBRL) + minBRL).toFixed(2);
-
-      // StableCoin: entre 100.000,00 e 5.000.000,00
-      const minStable = 100000;
-      const maxStable = 5000000;
-      const randomBalanceStable = (Math.random() * (maxStable - minStable) + minStable).toFixed(2);
+      // Saldos fixos para todas as contas
+      const fixedBalanceBRL = "5987654.00";
+      const fixedBalanceStable = "299678.16";
 
       const user = await storage.createUser({
         cpf,
@@ -68,8 +61,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: fullName,
         email,
         phone,
-        balanceBRL: randomBalanceBRL,
-        balanceStable: randomBalanceStable,
+        balanceBRL: fixedBalanceBRL,
+        balanceStable: fixedBalanceStable,
       });
 
       await storage.createPixKey({
