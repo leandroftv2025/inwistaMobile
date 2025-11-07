@@ -34,7 +34,12 @@ export default function PIX() {
   const { toast } = useToast();
   const { user, isAuthenticated, isInitialized } = useAuth();
   const userId = user?.id;
-  const [activeTab, setActiveTab] = useState("send");
+
+  // Verificar se veio com parâmetro tab=receive
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam === 'receive' ? 'receive' : 'send');
+
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTransaction, setPendingTransaction] = useState<any>(null);
