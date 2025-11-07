@@ -112,8 +112,8 @@ var MemStorage = class {
     const user = {
       ...insertUser,
       id,
-      balanceBRL: "0.00",
-      balanceStable: "0.00000000",
+      balanceBRL: insertUser.balanceBRL || "0.00",
+      balanceStable: insertUser.balanceStable || "0.00000000",
       totalInvested: "0.00",
       isActive: true,
       createdAt: /* @__PURE__ */ new Date()
@@ -291,7 +291,9 @@ var insertUserSchema = createInsertSchema(users).pick({
   password: true,
   name: true,
   email: true,
-  phone: true
+  phone: true,
+  balanceBRL: true,
+  balanceStable: true
 });
 var insertPixKeySchema = createInsertSchema(pixKeys).omit({
   id: true,
