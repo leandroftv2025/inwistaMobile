@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Pencil, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import logoPath from "@assets/logo-inwista.png";
+// Logo servido de public/attached_assets
 
 interface RegistrationData {
   fullName: string;
@@ -18,34 +18,40 @@ interface RegistrationData {
   confirmPassword: string;
 }
 
+const validateEmail = (email: string): boolean => {
+  // Regex mais robusta para validação de e-mail
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email.trim());
+};
+
 const validateCPF = (cpf: string): boolean => {
   const cleanCPF = cpf.replace(/\D/g, "");
-  
+
   // CPF de demonstração - exceção à regra
   if (cleanCPF === "12345678900") return true;
-  
+
   if (cleanCPF.length !== 11) return false;
-  
+
   if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
-  
+
   let sum = 0;
   for (let i = 0; i < 9; i++) {
     sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
   }
   let firstDigit = 11 - (sum % 11);
   if (firstDigit >= 10) firstDigit = 0;
-  
+
   if (parseInt(cleanCPF.charAt(9)) !== firstDigit) return false;
-  
+
   sum = 0;
   for (let i = 0; i < 10; i++) {
     sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
   }
   let secondDigit = 11 - (sum % 11);
   if (secondDigit >= 10) secondDigit = 0;
-  
+
   if (parseInt(cleanCPF.charAt(10)) !== secondDigit) return false;
-  
+
   return true;
 };
 
@@ -128,10 +134,10 @@ export default function Register() {
       });
       return;
     }
-    if (step === 2 && (!formData.email.trim() || !formData.email.includes("@"))) {
+    if (step === 2 && !validateEmail(formData.email)) {
       toast({
         title: "E-mail inválido",
-        description: "Por favor, informe um e-mail válido.",
+        description: "Por favor, informe um endereço de e-mail válido (exemplo: nome@email.com).",
         variant: "destructive",
       });
       return;
@@ -217,7 +223,7 @@ export default function Register() {
           <ArrowLeft className="w-6 h-6" />
         </Button>
         <div className="flex items-center gap-4">
-          <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+          <img src="/attached_assets/logo-inwista.png" alt="Logo" className="h-8 sm:h-10" />
         </div>
       </header>
 
@@ -278,23 +284,34 @@ export default function Register() {
                     E-mail
                   </Label>
                   <div className="mt-2">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      placeholder="nome@email.com"
-                      className="text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary"
-                      data-testid="input-email"
-                      autoFocus
-                    />
+                    <div className="relative">
+                      {formData.email && validateEmail(formData.email) && (
+                        <Check className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-600" />
+                      )}
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        placeholder="nome@email.com"
+                        className={`text-base border-0 border-b rounded-none focus-visible:ring-0 focus-visible:border-primary ${formData.email && validateEmail(formData.email) ? 'pl-10' : ''}`}
+                        data-testid="input-email"
+                        autoFocus
+                      />
+                    </div>
+                    {formData.email && !validateEmail(formData.email) && (
+                      <p className="text-xs text-destructive mt-1">
+                        E-mail inválido. Use o formato: nome@email.com
+                      </p>
+                    )}
                     <div className="flex justify-end mt-4">
                       <Button
                         onClick={handleNext}
                         size="icon"
-                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68]"
+                        disabled={!formData.email || !validateEmail(formData.email)}
+                        className="rounded-full h-12 w-12 bg-[#103549] hover:bg-[#1a4d68] disabled:opacity-50"
                         data-testid="button-next-step2"
                       >
                         <ArrowRight className="h-5 w-5" />

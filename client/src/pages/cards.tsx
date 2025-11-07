@@ -15,8 +15,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import cardFrontPath from "@assets/card-front.png";
-import cardBackPath from "@assets/card-back.png";
+import cardFrontImg from '/attached_assets/card-front.png?url';
+import cardBackImg from '/attached_assets/card-back.png?url';
 
 interface User {
   name: string;
@@ -234,16 +234,16 @@ export default function Cards() {
                   >
                     {/* Front Card Image */}
                     <img
-                      src={cardFrontPath}
+                      src={cardFrontImg}
                       alt="Frente do cartão"
                       className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                         showCardBack ? 'opacity-0 invisible' : 'opacity-100 visible'
                       }`}
                     />
-                    
+
                     {/* Back Card Image */}
                     <img
-                      src={cardBackPath}
+                      src={cardBackImg}
                       alt="Verso do cartão"
                       className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                         showCardBack ? 'opacity-100 visible' : 'opacity-0 invisible'

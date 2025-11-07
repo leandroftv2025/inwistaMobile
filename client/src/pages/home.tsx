@@ -24,7 +24,6 @@ import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { useQuery } from "@tanstack/react-query";
 import type { User, PixTransaction, StablecoinTransaction, Investment } from "@shared/schema";
-import pixIconPath from "@assets/pix-icon.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -96,12 +95,21 @@ export default function Home() {
       date: new Date(tx.createdAt),
       positive: tx.type === 'sell',
     })),
+    ...userInvestments.map((inv: any) => ({
+      id: `invest-${inv.id}`,
+      type: 'investment',
+      description: 'Investimento realizado',
+      name: inv.productName || 'Investimento',
+      amount: -parseFloat(inv.amount || '0'),
+      date: new Date(inv.createdAt),
+      positive: false,
+    })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
 
   const quickActions = [
     {
       slug: 'pix',
-      icon: pixIconPath,
+      icon: "/attached_assets/pix-icon.png",
       name: 'PIX',
       description: 'Transferências',
       color: 'text-primary',
@@ -278,7 +286,7 @@ export default function Home() {
             <CardTitle>{t("home.recentTransactions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isLoadingPix || isLoadingStable ? (
+            {isLoadingPix || isLoadingStable || isLoadingInvestments ? (
               <div className="space-y-4">
                 <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />

@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Delete, Shield } from "lucide-react";
-import logoPath from "@assets/logo-inwista.png";
+// Logo servido de public/attached_assets
 
 function generateRandomKeypadPairs() {
   const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -100,7 +100,7 @@ export default function Password() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center justify-between">
-        <img src={logoPath} alt="Logo" className="h-8 sm:h-10" />
+        <img src="/attached_assets/logo-inwista.png" alt="Logo" className="h-8 sm:h-10" />
         <div className="text-center flex-1">
           <p className="text-sm text-muted-foreground">{userData?.name || "Carregando..."}</p>
           <button

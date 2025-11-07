@@ -23,7 +23,7 @@ export function BottomNav() {
     {
       label: "Trazer",
       icon: ArrowDownToLine,
-      path: "/pix",
+      path: "/pix?tab=receive",
     },
     {
       label: "IWI Assistant",

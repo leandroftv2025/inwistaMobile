@@ -155,8 +155,8 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
-      balanceBRL: "0.00",
-      balanceStable: "0.00000000",
+      balanceBRL: insertUser.balanceBRL || "0.00",
+      balanceStable: insertUser.balanceStable || "0.00000000",
       totalInvested: "0.00",
       isActive: true,
       createdAt: new Date(),

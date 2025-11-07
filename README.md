@@ -252,6 +252,35 @@ netWorth = (balanceStable × currentRate) + totalInvested + balanceBRL
 6. **Investimentos** → Simule e invista
 7. **Configurações** → Troque idioma e tema
 
+## 🔒 Configuração SSL/HTTPS
+
+### Problema: "Sua conexão não é particular"?
+
+Se você está vendo avisos de segurança ao acessar via HTTPS, precisa instalar o certificado CA do mkcert no seu dispositivo.
+
+**Solução rápida (3 minutos):**
+
+1. **No servidor**, execute uma única vez:
+   ```bash
+   cd ~/inwistaMobile
+   sudo bash deploy/scripts/export_ssl_ca.sh
+   ```
+
+2. **Em cada dispositivo** que vai acessar, abra o navegador:
+   ```
+   http://192.168.1.15/ssl-ca
+   ```
+
+3. Baixe e instale o certificado seguindo as instruções da página
+
+**📖 Guia completo:** Veja [SSL-SETUP.md](./SSL-SETUP.md) para instruções detalhadas por plataforma (Windows, Mac, Linux, Android, iOS)
+
+### Por que isso é necessário?
+
+A aplicação usa certificados SSL locais gerados pelo `mkcert` para HTTPS. Estes certificados são seguros e funcionam apenas na rede local, mas seu navegador não os conhece por padrão. Ao instalar o certificado CA root, você está dizendo: "Eu confio nos certificados deste servidor".
+
+**Segurança:** O certificado só funciona para 192.168.1.15 na rede local. NÃO afeta sua segurança em outros sites da internet.
+
 ## 🚀 Roadmap
 
 ### Fase 1 - MVP Completo ✅

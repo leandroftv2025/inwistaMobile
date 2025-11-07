@@ -12,13 +12,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, Moon, Sun, Monitor, Globe, Fingerprint, Lock, Shield, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import type { User } from "@shared/schema";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const userId = user?.id;
+
+  const { data: userData } = useQuery<User>({
+    queryKey: [`/api/user/${userId}`],
+    enabled: !!userId,
+  });
 
   const handleLogout = () => {
     logout();
@@ -61,8 +69,8 @@ export default function Settings() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Ana Maria Silva</p>
-                <p className="text-sm text-muted-foreground">ana@inwista.com</p>
+                <p className="font-medium">{userData?.name || 'Usuário'}</p>
+                <p className="text-sm text-muted-foreground">{userData?.email || 'email@inwista.com'}</p>
               </div>
               <Button variant="outline" size="sm" data-testid="button-edit-profile">
                 {t("common.edit")}

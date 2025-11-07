@@ -1,4 +1,4 @@
-import logoPath from "@assets/Logo Inwista_1762037237480.png";
+import logoInwista from '/attached_assets/logo-inwista.png?url';
 
 interface LogoProps {
   className?: string;
@@ -14,7 +14,7 @@ export function Logo({ className = "", size = "md" }: LogoProps) {
 
   return (
     <img
-      src={logoPath}
+      src={logoInwista}
       alt="Inwista"
       className={`${sizeClasses[size]} ${className}`}
       data-testid="img-logo"

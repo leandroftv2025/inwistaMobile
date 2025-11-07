@@ -82,6 +82,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
   email: true,
   phone: true,
+  balanceBRL: true,
+  balanceStable: true,
 });
 
 export const insertPixKeySchema = createInsertSchema(pixKeys).omit({

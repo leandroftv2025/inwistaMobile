@@ -27,14 +27,19 @@ import { useAuth } from "@/lib/auth-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User, PixKey, PixTransaction } from "@shared/schema";
-import qrCodeImage from "@assets/qrcode-pix_1762052957607.jpg";
+import qrCodePixImg from '/attached_assets/qrcode-pix_1762052957607.jpg?url';
 
 export default function PIX() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user, isAuthenticated, isInitialized } = useAuth();
   const userId = user?.id;
-  const [activeTab, setActiveTab] = useState("send");
+
+  // Verificar se veio com parâmetro tab=receive
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam === 'receive' ? 'receive' : 'send');
+
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTransaction, setPendingTransaction] = useState<any>(null);
@@ -230,14 +235,14 @@ export default function PIX() {
 
   const downloadQRCode = () => {
     if (pixKeys.length === 0) return;
-    
+
     const link = document.createElement('a');
-    link.href = qrCodeImage;
+    link.href = qrCodePixImg;
     link.download = 'qrcode-pix.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "QR Code baixado!",
       description: "O QR Code foi salvo com sucesso",
@@ -407,7 +412,7 @@ export default function PIX() {
                     <Skeleton className="w-64 h-64" />
                   ) : pixKeys.length > 0 ? (
                     <img
-                      src={qrCodeImage}
+                      src={qrCodePixImg}
                       alt="QR Code PIX"
                       className="w-64 h-64 border rounded-md"
                       data-testid="img-qr-code"
