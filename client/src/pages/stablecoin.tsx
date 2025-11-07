@@ -238,15 +238,15 @@ export default function StableCOIN() {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-muted-foreground">Saldo BRL</p>
-                    <p className="text-2xl font-bold font-mono tabular-nums" data-testid="text-balance-brl">
+                    <p className="text-xl sm:text-2xl font-bold font-mono tabular-nums break-words" data-testid="text-balance-brl">
                       {formatCurrency(balanceBRL)}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-muted-foreground">Saldo Stable</p>
-                    <p className="text-2xl font-bold font-mono tabular-nums" data-testid="text-balance-stable">
+                    <p className="text-xl sm:text-2xl font-bold font-mono tabular-nums break-words" data-testid="text-balance-stable">
                       {new Intl.NumberFormat("pt-BR", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,

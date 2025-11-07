@@ -95,6 +95,15 @@ export default function Home() {
       date: new Date(tx.createdAt),
       positive: tx.type === 'sell',
     })),
+    ...userInvestments.map((inv: any) => ({
+      id: `invest-${inv.id}`,
+      type: 'investment',
+      description: 'Investimento realizado',
+      name: inv.productName || 'Investimento',
+      amount: -parseFloat(inv.amount || '0'),
+      date: new Date(inv.createdAt),
+      positive: false,
+    })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
 
   const quickActions = [
@@ -277,7 +286,7 @@ export default function Home() {
             <CardTitle>{t("home.recentTransactions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isLoadingPix || isLoadingStable ? (
+            {isLoadingPix || isLoadingStable || isLoadingInvestments ? (
               <div className="space-y-4">
                 <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />
