@@ -381,20 +381,16 @@ async function registerRoutes(app2) {
       if (existingUser) {
         return res.status(400).json({ message: "CPF j\xE1 cadastrado" });
       }
-      const minBRL = 1e6;
-      const maxBRL = 5e7;
-      const randomBalanceBRL = (Math.random() * (maxBRL - minBRL) + minBRL).toFixed(2);
-      const minStable = 1e5;
-      const maxStable = 5e6;
-      const randomBalanceStable = (Math.random() * (maxStable - minStable) + minStable).toFixed(2);
+      const fixedBalanceBRL = "5987654.00";
+      const fixedBalanceStable = "299678.16";
       const user = await storage.createUser({
         cpf,
         password,
         name: fullName,
         email,
         phone,
-        balanceBRL: randomBalanceBRL,
-        balanceStable: randomBalanceStable
+        balanceBRL: fixedBalanceBRL,
+        balanceStable: fixedBalanceStable
       });
       await storage.createPixKey({
         userId: user.id,
